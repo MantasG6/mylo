@@ -1,0 +1,997 @@
+openapi: 3.1.0
+info:
+  title: Mylo API
+  description: |-
+    Mylo helps you to achieve anything you want by creating a customizable accountability environment to track your goals.
+
+    Github: [https://github.com/MantasG6/mylo](https://github.com/MantasG6/mylo)
+
+  termsOfService: ...
+  contact:
+    email: mantas.gricius6@gmail.com
+  license:
+    name: MIT
+    url: https://mit-license.org/
+  version: v1
+externalDocs:
+  description: Check out the Github repo!
+  url: https://github.com/MantasG6/mylo
+servers:
+  - url: https://localhost:8080/api/v3
+    description: Local server (OAS 3.2)
+
+tags:
+  - name: workspace
+    description: All the details about the user workspace
+  - name: goal
+    description: Operations to add and manage User goals
+  - name: progress
+    description: Operations to track user progress
+  - name: pomodoro
+    description: Operations to create and configure pomodoro timers
+paths:
+  /workspace:
+    get:
+      tags:
+        - workspace
+      summary: Get all user workspaces.
+      description: Get all user workspaces.
+      operationId: getWorkspaces
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workspace'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workspace'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - api_key: []
+        - mylo_auth:
+            - write:workspaces
+            - read:workspaces
+    put:
+      tags:
+        - workspace
+      summary: Update an existing workspace.
+      description: Update an existing workspace by Id.
+      operationId: updateWorkspace
+      requestBody:
+        description: Update an existing workspace in the workspace
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Workspace'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Workspace'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Workspace'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Workspace not found
+        '422':
+          description: Validation exception
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - mylo_auth:
+            - write:workspaces
+            - read:workspaces
+    post:
+      tags:
+        - workspace
+      summary: Add a new workspace.
+      description: Add a new workspace.
+      operationId: addWorkspace
+      requestBody:
+        description: Create a new workspace
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Workspace'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Workspace'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Workspace'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - mylo_auth:
+            - write:workspaces
+            - read:workspaces
+  /workspace/{workspaceId}:
+    get:
+      tags:
+        - workspace
+      summary: Find workspace by identifier.
+      description: Returns a single workspace.
+      operationId: getWorkspaceById
+      parameters:
+        - name: workspaceId
+          in: path
+          description: ID of a workspace to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Workspace not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - api_key: []
+        - mylo_auth:
+            - write:workspaces
+            - read:workspaces
+    delete:
+      tags:
+        - workspace
+      summary: Deletes a workspace.
+      description: delete a workspace.
+      operationId: deleteWorkspace
+      parameters:
+        - name: api_key
+          in: header
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: workspaceId
+          in: path
+          description: Workspace id to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid workspace value
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - mylo_auth:
+            - write:workspaces
+            - read:workspaces
+  /goal:
+    get:
+      tags:
+        - goal
+      summary: Get all user goals.
+      description: Get all user goals.
+      operationId: getGoals
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Goal'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Goal'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - api_key: []
+        - mylo_auth:
+            - write:goals
+            - read:goals
+    put:
+      tags:
+        - goal
+      summary: Update an existing goal.
+      description: Update an existing goal by Id.
+      operationId: updateGoal
+      requestBody:
+        description: Update an existing goal in the workspace
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Goal'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Goal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Goal'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Goal not found
+        '422':
+          description: Validation exception
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - mylo_auth:
+            - write:goals
+            - read:goals
+    post:
+      tags:
+        - goal
+      summary: Add a new goal to the workspace.
+      description: Add a new goal to the workspace.
+      operationId: addGoal
+      requestBody:
+        description: Create a new goal in the workspace
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Goal'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Goal'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Goal'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - mylo_auth:
+            - write:goals
+            - read:goals
+  /goal/{goalId}:
+    get:
+      tags:
+        - goal
+      summary: Find goal by identifier.
+      description: Returns a single goal.
+      operationId: getGoalById
+      parameters:
+        - name: goalId
+          in: path
+          description: ID of a goal to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Goal'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Goal'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Goal not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - api_key: []
+        - mylo_auth:
+            - write:goals
+            - read:goals
+    delete:
+      tags:
+        - goal
+      summary: Deletes a goal.
+      description: delete a goal.
+      operationId: deleteGoal
+      parameters:
+        - name: api_key
+          in: header
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: goalId
+          in: path
+          description: Goal id to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid goal value
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - mylo_auth:
+            - write:goals
+            - read:goals
+  /progress:
+    get:
+      tags:
+        - progress
+      summary: Get all user progress.
+      description: Get all user progress.
+      operationId: getProgress
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Progress'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Progress'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - api_key: []
+        - mylo_auth:
+            - write:progress
+            - read:progress
+    put:
+      tags:
+        - progress
+      summary: Update an existing progress.
+      description: Update an existing progress by Id.
+      operationId: updateProgress
+      requestBody:
+        description: Update an existing progress
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Progress'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Progress'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Progress'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Progress'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Progress'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Progress not found
+        '422':
+          description: Validation exception
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - mylo_auth:
+            - write:progress
+            - read:progress
+    post:
+      tags:
+        - progress
+      summary: Add a new progress
+      description: Add a new progress
+      operationId: addProgress
+      requestBody:
+        description: Create a new progress
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Progress'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Progress'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Progress'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Progress'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Progress'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - mylo_auth:
+            - write:progress
+            - read:progress
+  /progress/{progressId}:
+    get:
+      tags:
+        - progress
+      summary: Find progress by identifier.
+      description: Returns a single progress.
+      operationId: getProgressById
+      parameters:
+        - name: progressId
+          in: path
+          description: ID of a progress to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Progress'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Progress'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Progress not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - api_key: []
+        - mylo_auth:
+            - write:progress
+            - read:progress
+    delete:
+      tags:
+        - progress
+      summary: Deletes a progress.
+      description: delete a progress.
+      operationId: deleteProgress
+      parameters:
+        - name: api_key
+          in: header
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: progressId
+          in: path
+          description: Progress id to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid progress value
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - mylo_auth:
+            - write:progress
+            - read:progress
+  /pomodoro:
+    get:
+      tags:
+        - pomodoro
+      summary: Get all user pomodoro.
+      description: Get all user pomodoro.
+      operationId: getPomodoro
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pomodoro'
+            application/xml:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Pomodoro'
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - api_key: []
+        - mylo_auth:
+            - write:pomodoro
+            - read:pomodoro
+    put:
+      tags:
+        - pomodoro
+      summary: Update an existing pomodoro.
+      description: Update an existing pomodoro by Id.
+      operationId: updatePomodoro
+      requestBody:
+        description: Update an existing pomodoro
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pomodoro'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Pomodoro'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Pomodoro'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pomodoro'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Pomodoro'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Pomodoro not found
+        '422':
+          description: Validation exception
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - mylo_auth:
+            - write:pomodoro
+            - read:pomodoro
+    post:
+      tags:
+        - pomodoro
+      summary: Add a new pomodoro
+      description: Add a new pomodoro
+      operationId: addPomodoro
+      requestBody:
+        description: Create a new pomodoro
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pomodoro'
+          application/xml:
+            schema:
+              $ref: '#/components/schemas/Pomodoro'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Pomodoro'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pomodoro'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Pomodoro'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - mylo_auth:
+            - write:pomodoro
+            - read:pomodoro
+  /pomodoro/{pomodoroId}:
+    get:
+      tags:
+        - pomodoro
+      summary: Find pomodoro by identifier.
+      description: Returns a single pomodoro.
+      operationId: getPomodoroById
+      parameters:
+        - name: pomodoroId
+          in: path
+          description: ID of a pomodoro to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pomodoro'
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/Pomodoro'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Pomodoro not found
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - api_key: []
+        - mylo_auth:
+            - write:pomodoro
+            - read:pomodoro
+    delete:
+      tags:
+        - pomodoro
+      summary: Deletes a pomodoro.
+      description: delete a pomodoro.
+      operationId: deletePomodoro
+      parameters:
+        - name: api_key
+          in: header
+          description: ''
+          required: false
+          schema:
+            type: string
+        - name: pomodoroId
+          in: path
+          description: Pomodoro id to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Invalid pomodoro value
+        default:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+      security:
+        - mylo_auth:
+            - write:pomodoro
+            - read:pomodoro
+components:
+  schemas:
+    Workspace:
+      required:
+        - id
+        - name
+        - userId
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples: [10]
+        userId:
+          type: string
+          examples: [2d942273-04bb-4e8c-b03a-3efb72b84a62]
+        name:
+          type: string
+          examples: [Personal Goals]
+        widgets:
+          type: array
+          items:
+            type: integer
+            format: int64
+            examples: [44, 468]
+    Widget:
+      required:
+        - widgetType
+        - position
+        - data
+        - workspaces
+      type: object
+      properties:
+        widgetType:
+          type: string
+          enum:
+            - Goal
+            - Pomodoro
+        position:
+          type: integer
+          format: int64
+          examples: [1]
+        data:
+          type: object
+          examples:
+            [Goal]
+        workspaces:
+          type: array
+          items:
+            type: integer
+            format: int64
+            examples: [3, 44, 468]
+    Goal:
+      required:
+        - id
+        - userId
+        - name
+        - target
+        - tracking
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples: [10]
+        userId:
+          type: string
+          examples: [2d942273-04bb-4e8c-b03a-3efb72b84a62]
+        name:
+          type: string
+          examples: [programming]
+        target:
+          type: integer
+          format: int64
+          examples: [300]
+        tracking:
+          type: string
+          enum:
+            - daily
+            - weekly
+            - monthly
+    Progress:
+      required:
+        - id
+        - goalId
+        - userId
+        - name
+        - target
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples: [10]
+        goalId:
+          type: integer
+          format: int64
+          examples: [44]
+        userId:
+          type: string
+          examples: [2d942273-04bb-4e8c-b03a-3efb72b84a62]
+        name:
+          type: string
+          examples: [programming]
+        target:
+          type: integer
+          format: int64
+          examples: [300]
+    Pomodoro:
+      required:
+        - id
+        - goalId
+        - userId
+        - shortBreak
+        - longBreak
+        - longBreakFrequency
+        - work
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          examples: [10]
+        goalId:
+          type: integer
+          format: int64
+          examples: [4]
+        userId:
+          type: string
+          examples: [2d942273-04bb-4e8c-b03a-3efb72b84a62]
+        shortBreak:
+          type: integer
+          format: int64
+          examples: [5]
+        longBreak:
+          type: integer
+          format: int64
+          examples: [15]
+        longBreakFrequency:
+          type: integer
+          format: int64
+          examples: [4]
+        work:
+          type: integer
+          format: int64
+          examples: [25]
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+  requestBodies:
+    Goal:
+      description: Goal object that needs to be added to the workspace
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Goal'
+        application/xml:
+          schema:
+            $ref: '#/components/schemas/Goal'
+  securitySchemes:
+    mylo_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://mylo.swagger.io/oauth/authorize
+          scopes:
+            "write:workspaces": modify workspaces
+            "read:workspaces": read workspaces
+            "write:goals": modify goals in your account
+            "read:goals": read your goals
+            "write:progress": modify your progress
+            "read:progress": read your progress
+            "write:pomodoro": modify pomodoro timers
+            "read:pomodoro": read pomodoro timers
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
