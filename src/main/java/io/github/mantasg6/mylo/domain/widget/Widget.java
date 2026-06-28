@@ -1,7 +1,7 @@
-package io.github.mantasg6.mylo.domain.widget.entities;
+package io.github.mantasg6.mylo.domain.widget;
 
 import io.github.mantasg6.mylo.core.database.BaseEntity;
-import io.github.mantasg6.mylo.domain.workspace.entities.Workspace;
+import io.github.mantasg6.mylo.domain.workspace.Workspace;
 import io.github.mantasg6.mylo.shared.enums.WidgetType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
