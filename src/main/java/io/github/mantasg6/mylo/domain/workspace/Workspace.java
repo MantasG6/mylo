@@ -1,5 +1,6 @@
 package io.github.mantasg6.mylo.domain.workspace;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,5 +27,9 @@ public class Workspace extends BaseEntity {
         orphanRemoval = true
     )
     private List<Widget> widgets = new ArrayList<>();
+
+    private LocalDateTime from;
+
+    private LocalDateTime to;
 
 }
