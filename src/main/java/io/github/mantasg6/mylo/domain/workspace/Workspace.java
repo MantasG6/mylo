@@ -13,6 +13,10 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Workspace entity representing user workspace database table
+ *
+ */
 @Getter
 @Setter
 @Entity

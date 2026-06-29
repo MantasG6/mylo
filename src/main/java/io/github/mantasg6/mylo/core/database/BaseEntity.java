@@ -14,6 +14,10 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Base entity containing features that every entity has
+ *
+ */
 @Getter
 @Setter
 @MappedSuperclass

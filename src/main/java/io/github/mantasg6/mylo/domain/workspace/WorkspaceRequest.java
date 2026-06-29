@@ -4,6 +4,10 @@ import java.time.LocalDateTime;
 
 import lombok.Builder;
 
+/**
+ * Workspace request DTO
+ *
+ */
 @Builder
 public record WorkspaceRequest(
     String name,

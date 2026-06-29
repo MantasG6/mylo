@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.RequiredArgsConstructor;
 
 
+/**
+ * Workspace controller describes API HTTP contract for workspaces
+ *
+ */
 @RestController
 @RequestMapping(WorkspaceController.WORKSPACES_API)
 @RequiredArgsConstructor
@@ -19,6 +23,11 @@ public class WorkspaceController {
 
     public static final String WORKSPACES_API = "/api/v1/workspaces";
 
+    /**
+     * Retrieve all existing workspaces
+     *
+     * @return List of existing workspaces
+     */
     @GetMapping
     public ResponseEntity<List<WorkspaceResponse>> getAll() {
         return ResponseEntity.ok(workspaceService.getAllWorkspaces());

@@ -14,6 +14,10 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * Widget entity representing widget database table
+ *
+ */
 @Getter
 @Setter
 @Entity
