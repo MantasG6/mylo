@@ -1,5 +1,6 @@
 package io.github.mantasg6.mylo.domain.workspace;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,8 +15,8 @@ import lombok.Builder;
 public record WorkspaceResponse(
     String name,
     List<Widget> widgets,
-    LocalDateTime from,
-    LocalDateTime to,
+    LocalDate periodFrom,
+    LocalDate periodTo,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) { }

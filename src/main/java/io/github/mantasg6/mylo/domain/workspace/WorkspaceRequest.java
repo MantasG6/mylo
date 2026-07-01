@@ -1,6 +1,6 @@
 package io.github.mantasg6.mylo.domain.workspace;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import lombok.Builder;
 
@@ -11,6 +11,6 @@ import lombok.Builder;
 @Builder
 public record WorkspaceRequest(
     String name,
-    LocalDateTime from,
-    LocalDateTime to
+    LocalDate periodFrom,
+    LocalDate periodTo
 ) { }
