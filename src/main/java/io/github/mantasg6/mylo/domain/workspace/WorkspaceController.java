@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,6 +32,11 @@ public class WorkspaceController {
     @GetMapping
     public ResponseEntity<List<WorkspaceResponse>> getAll() {
         return ResponseEntity.ok(workspaceService.getAllWorkspaces());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<WorkspaceResponse> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(workspaceService.getWorkspaceById(id));
     }
         
 }
