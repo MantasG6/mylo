@@ -1,7 +1,7 @@
 package io.github.mantasg6.mylo.domain.workspace;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import io.github.mantasg6.mylo.domain.widget.Widget;
@@ -17,6 +17,6 @@ public record WorkspaceResponse(
     List<Widget> widgets,
     LocalDate periodFrom,
     LocalDate periodTo,
-    LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    Instant createdAt,
+    Instant updatedAt
 ) { }
