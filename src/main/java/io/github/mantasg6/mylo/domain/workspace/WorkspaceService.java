@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Workspace management service
+ * Workspace management service.
  *
  */
 @Service

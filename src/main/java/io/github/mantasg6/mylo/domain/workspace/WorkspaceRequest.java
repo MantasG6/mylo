@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import lombok.Builder;
 
 /**
- * Workspace request DTO
+ * Workspace request DTO.
  *
  */
 @Builder

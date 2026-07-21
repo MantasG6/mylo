@@ -1,12 +1,17 @@
 package io.github.mantasg6.mylo.domain.workspace.util;
 
+import static io.github.mantasg6.mylo.domain.workspace.WorkspaceControllerTest.ENDPOINT_WITH_INVALID_ID;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.Instant;
 import java.time.LocalDate;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.test.web.servlet.ResultActions;
 
+import io.github.mantasg6.mylo.domain.workspace.WorkspaceErrorMessage;
 import io.github.mantasg6.mylo.domain.workspace.WorkspaceRequest;
 import io.github.mantasg6.mylo.domain.workspace.WorkspaceResponse;
 
@@ -135,6 +140,7 @@ public final class WorkspaceTestFactory {
      */
     public static ResultActions assertDefault(ResultActions result) throws Exception {
         return result
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(DEFAULT_NAME))
                 .andExpect(jsonPath("$.periodFrom").value(DEFAULT_PERIOD_FROM.toString()))
                 .andExpect(jsonPath("$.periodTo").value(DEFAULT_PERIOD_TO.toString()))
@@ -151,11 +157,28 @@ public final class WorkspaceTestFactory {
      */
     public static ResultActions assertPartiallyUpdated(ResultActions result) throws Exception {
         return result
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(UPDATED_NAME))
                 .andExpect(jsonPath("$.periodFrom").value(DEFAULT_PERIOD_FROM.toString()))
                 .andExpect(jsonPath("$.periodTo").value(UPDATED_PERIOD_TO.toString()))
                 .andExpect(jsonPath("$.createdAt").value(DEFAULT_CREATED_AT.toString()))
                 .andExpect(jsonPath("$.updatedAt").value(NEW_UPDATED_AT.toString()));
+    }
+
+    /**
+     * Assert a request with invalid id returns a Not Found {@link ProblemDetail} response
+     *
+     * @param result Json result.
+     * @return {@link ResultActions} payload equals Not Found {@link ProblemDetail} response.
+     * @throws Exception If any of the assertions fail.
+     */
+    public static ResultActions assertNotFound(ResultActions result) throws Exception {
+        return result
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.detail").value(WorkspaceErrorMessage.notFound(INVALID_ID)))
+                .andExpect(jsonPath("$.instance").value(ENDPOINT_WITH_INVALID_ID))
+                .andExpect(jsonPath("$.status").value(HttpStatus.NOT_FOUND.value()))
+                .andExpect(jsonPath("$.title").value(HttpStatus.NOT_FOUND.getReasonPhrase()));
     }
 
 }

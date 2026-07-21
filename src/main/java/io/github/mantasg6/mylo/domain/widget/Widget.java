@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Widget entity representing widget database table
+ * Widget entity representing widget database table.
  *
  */
 @Getter

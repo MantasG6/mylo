@@ -8,7 +8,7 @@ import io.github.mantasg6.mylo.domain.widget.Widget;
 import lombok.Builder;
 
 /**
- * Workspace response DTO
+ * Workspace response DTO.
  *
  */
 @Builder

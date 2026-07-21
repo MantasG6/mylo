@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Workspace entity representing user workspace database table
+ * Workspace entity representing user workspace database table.
  *
  */
 @Getter

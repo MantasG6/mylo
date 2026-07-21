@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Base entity containing features that every entity has
+ * Base entity containing features that every entity has.
  *
  */
 @Getter

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import io.github.mantasg6.mylo.domain.workspace.util.WorkspaceTestFactory;
 
@@ -20,7 +21,7 @@ import io.github.mantasg6.mylo.domain.workspace.util.WorkspaceTestFactory;
  *
  */
 @WebMvcTest(WorkspaceController.class)
-class WorkspaceControllerTest {
+public class WorkspaceControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -31,25 +32,41 @@ class WorkspaceControllerTest {
     private static final String BASE_ENDPOINT = WorkspaceController.WORKSPACES_API;
     private static final String ENDPOINT_WITH_ID = BASE_ENDPOINT + "/" +
             WorkspaceTestFactory.VALID_ID;
+    public static final String ENDPOINT_WITH_INVALID_ID = BASE_ENDPOINT + "/" +
+            WorkspaceTestFactory.INVALID_ID;
 
     @Test
-    void givenNoId_whenGET_returnsOk() throws Exception {
+    void shouldReturnOk_whenGetWithNoId() throws Exception {
         List<WorkspaceResponse> workspaces = List.of(
-            WorkspaceTestFactory.defaultWorkspaceResponse(),
-            WorkspaceTestFactory.updateWorkspaceResponse()
-        );
+                WorkspaceTestFactory.defaultWorkspaceResponse(),
+                WorkspaceTestFactory.updateWorkspaceResponse());
         when(workspaceService.getAllWorkspaces())
-            .thenReturn(workspaces);
+                .thenReturn(workspaces);
 
         mockMvc.perform(get(BASE_ENDPOINT))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(2));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
     }
 
     @Test
-    void givenValidId_whenGET_returnsOk() throws Exception {
-        mockMvc.perform(get(ENDPOINT_WITH_ID))
-                .andExpect(status().isOk());
+    void shouldReturnOk_whenGetWithId() throws Exception {
+        when(workspaceService.getWorkspaceById(WorkspaceTestFactory.VALID_ID))
+                .thenReturn(WorkspaceTestFactory.defaultWorkspaceResponse());
+
+        ResultActions result = mockMvc.perform(get(ENDPOINT_WITH_ID));
+
+        WorkspaceTestFactory.assertDefault(result);
+    }
+
+    @Test
+    void shouldReturnNotFound_whenGetWithInvalidId() throws Exception {
+        Long id = WorkspaceTestFactory.INVALID_ID;
+        when(workspaceService.getWorkspaceById(id))
+                .thenThrow(new WorkspaceNotFoundException(id));
+
+        ResultActions result = mockMvc.perform(get(ENDPOINT_WITH_INVALID_ID));
+
+        WorkspaceTestFactory.assertNotFound(result);
     }
 
 }
