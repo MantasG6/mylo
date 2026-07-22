@@ -33,7 +33,7 @@ public class WorkspaceControllerTest {
     private WorkspaceService workspaceService;
 
     @Test
-    void shouldReturnAll_whenGetWithNoId() throws Exception {
+    void shouldReturnAll_whenGetWithNoId() {
         List<WorkspaceResponse> workspaces = List.of(
                 WorkspaceResponse.builder().name("workspace1").build(),
                 WorkspaceResponse.builder().name("workspace2").build(),
@@ -53,7 +53,7 @@ public class WorkspaceControllerTest {
     }
 
     @Test
-    void shouldReturnSingleWorkspace_whenGetWithId() throws Exception {
+    void shouldReturnSingleWorkspace_whenGetWithId() {
         WorkspaceResponse expected = WorkspaceResponse.builder()
                 .name("expectedWorkspace")
                 .periodFrom(LocalDate.of(2020, 06, 20))
@@ -75,7 +75,7 @@ public class WorkspaceControllerTest {
     }
 
     @Test
-    void shouldReturnNotFound_whenGetWithInvalidId() throws Exception {
+    void shouldReturnNotFound_whenGetWithInvalidId() {
         Long invalid_id = -1L;
         when(workspaceService.getWorkspaceById(invalid_id))
                 .thenThrow(new WorkspaceNotFoundException(invalid_id));
