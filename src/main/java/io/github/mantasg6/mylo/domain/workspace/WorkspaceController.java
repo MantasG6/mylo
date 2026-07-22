@@ -22,7 +22,7 @@ public class WorkspaceController {
 
     private final WorkspaceService workspaceService;
 
-    public static final String WORKSPACES_API = "/api/v1/workspaces";
+    public static final String WORKSPACES_API = "/api/workspaces";
 
     /**
      * Retrieve all existing workspaces.

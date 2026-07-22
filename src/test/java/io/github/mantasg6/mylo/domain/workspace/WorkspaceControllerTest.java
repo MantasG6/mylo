@@ -1,72 +1,96 @@
 package io.github.mantasg6.mylo.domain.workspace;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.client.RestTestClient;
 
-import io.github.mantasg6.mylo.domain.workspace.util.WorkspaceTestFactory;
 
 /**
  * Workspace API HTTP contract tests
  *
  */
 @WebMvcTest(WorkspaceController.class)
+@AutoConfigureRestTestClient
 public class WorkspaceControllerTest {
 
     @Autowired
-    private MockMvc mockMvc;
+    RestTestClient restTestClient;
 
     @MockitoBean
     private WorkspaceService workspaceService;
 
-    private static final String BASE_ENDPOINT = WorkspaceController.WORKSPACES_API;
-    private static final String ENDPOINT_WITH_ID = BASE_ENDPOINT + "/" +
-            WorkspaceTestFactory.VALID_ID;
-    public static final String ENDPOINT_WITH_INVALID_ID = BASE_ENDPOINT + "/" +
-            WorkspaceTestFactory.INVALID_ID;
-
     @Test
-    void shouldReturnOk_whenGetWithNoId() throws Exception {
+    void shouldReturnAll_whenGetWithNoId() throws Exception {
         List<WorkspaceResponse> workspaces = List.of(
-                WorkspaceTestFactory.defaultWorkspaceResponse(),
-                WorkspaceTestFactory.updateWorkspaceResponse());
+                WorkspaceResponse.builder().name("workspace1").build(),
+                WorkspaceResponse.builder().name("workspace2").build(),
+                WorkspaceResponse.builder().name("workspace3").build()
+        );
         when(workspaceService.getAllWorkspaces())
                 .thenReturn(workspaces);
 
-        mockMvc.perform(get(BASE_ENDPOINT))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2));
+        List<WorkspaceResponse> response = restTestClient.get().uri("/api/workspaces")
+            .exchange()
+            .expectStatus().isOk()
+            .expectBody(new ParameterizedTypeReference<List<WorkspaceResponse>>() {})
+            .returnResult()
+            .getResponseBody();
+
+        assertThat(response).hasSize(3);
     }
 
     @Test
-    void shouldReturnOk_whenGetWithId() throws Exception {
-        when(workspaceService.getWorkspaceById(WorkspaceTestFactory.VALID_ID))
-                .thenReturn(WorkspaceTestFactory.defaultWorkspaceResponse());
+    void shouldReturnSingleWorkspace_whenGetWithId() throws Exception {
+        WorkspaceResponse expected = WorkspaceResponse.builder()
+                .name("expectedWorkspace")
+                .periodFrom(LocalDate.of(2020, 06, 20))
+                .periodTo(LocalDate.of(2020, 06, 21))
+                .build();
+        when(workspaceService.getWorkspaceById(1L))
+                .thenReturn(expected);
 
-        ResultActions result = mockMvc.perform(get(ENDPOINT_WITH_ID));
+        WorkspaceResponse response = restTestClient.get().uri("/api/workspaces/1")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(WorkspaceResponse.class)
+                .returnResult()
+                .getResponseBody();
 
-        WorkspaceTestFactory.assertDefault(result);
+        assertThat(response.name()).isEqualTo("expectedWorkspace");
+        assertThat(response.periodFrom()).isEqualTo(LocalDate.of(2020, 06, 20));
+        assertThat(response.periodTo()).isEqualTo(LocalDate.of(2020, 06, 21));
     }
 
     @Test
     void shouldReturnNotFound_whenGetWithInvalidId() throws Exception {
-        Long id = WorkspaceTestFactory.INVALID_ID;
-        when(workspaceService.getWorkspaceById(id))
-                .thenThrow(new WorkspaceNotFoundException(id));
+        Long invalid_id = -1L;
+        when(workspaceService.getWorkspaceById(invalid_id))
+                .thenThrow(new WorkspaceNotFoundException(invalid_id));
 
-        ResultActions result = mockMvc.perform(get(ENDPOINT_WITH_INVALID_ID));
+        ProblemDetail response = restTestClient.get().uri("/api/workspaces/-1")
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(ProblemDetail.class)
+                .returnResult()
+                .getResponseBody();
 
-        WorkspaceTestFactory.assertNotFound(result);
+        assertThat(response.getDetail()).isEqualTo("Workspace with id -1 not found!");
+        assertThat(response.getInstance()).isEqualTo(URI.create("/api/workspaces/-1"));
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(response.getTitle()).isEqualTo(HttpStatus.NOT_FOUND.getReasonPhrase());
     }
 
 }
