@@ -1,12 +1,16 @@
 package io.github.mantasg6.mylo.domain.workspace;
 
+import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
 
@@ -43,6 +47,25 @@ public class WorkspaceController {
     @GetMapping("/{id}")
     public ResponseEntity<WorkspaceResponse> getById(@PathVariable Long id) {
         return ResponseEntity.ok(workspaceService.getWorkspaceById(id));
+    }
+
+    /**
+     * Create a user workspace.
+     *
+     * @param request Workspace request containing required details about the workspace.
+     * @return HTTP response 201 with the created workspace in the body.
+     */
+    @PostMapping()
+    public ResponseEntity<WorkspaceResponse> createWorkspace(@RequestBody WorkspaceRequest request) {
+        WorkspaceResponse created = workspaceService.createWorkspace(request);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(created.id())
+                .toUri();
+
+        return ResponseEntity.created(location).body(created);
     }
         
 }

@@ -13,6 +13,7 @@ import lombok.Builder;
  */
 @Builder
 public record WorkspaceResponse(
+    Long id,
     String name,
     List<Widget> widgets,
     LocalDate periodFrom,

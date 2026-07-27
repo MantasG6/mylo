@@ -15,6 +15,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.client.EntityExchangeResult;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
 
@@ -91,6 +92,43 @@ public class WorkspaceControllerTest {
         assertThat(response.getInstance()).isEqualTo(URI.create("/api/workspaces/-1"));
         assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(response.getTitle()).isEqualTo(HttpStatus.NOT_FOUND.getReasonPhrase());
+    }
+
+    @Test
+    void shouldReturnCreated_whenPostWithValidRequest() {
+        Long id = 1L;
+        String name = "workspace";
+        LocalDate periodFrom = LocalDate.of(2025, 8, 20);
+        LocalDate periodTo = LocalDate.of(2025, 9, 20);
+        WorkspaceRequest request = WorkspaceRequest.builder()
+                .name(name)
+                .periodFrom(periodFrom)
+                .periodTo(periodTo)
+                .build();
+        WorkspaceResponse expected = WorkspaceResponse.builder()
+                .id(id)
+                .name(name)
+                .periodFrom(periodFrom)
+                .periodTo(periodTo)
+                .build();
+        when(workspaceService.createWorkspace(request))
+                .thenReturn(expected);
+
+        EntityExchangeResult<WorkspaceResponse> result = restTestClient.post().uri("/api/workspaces")
+                .body(request)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(WorkspaceResponse.class)
+                .returnResult();
+        URI location = result.getResponseHeaders().getLocation();
+        WorkspaceResponse actual = result.getResponseBody();
+
+
+        assertThat(location.getPath()).isEqualTo("/api/workspaces/1");
+        assertThat(actual.id()).isEqualTo(id);
+        assertThat(actual.name()).isEqualTo(name);
+        assertThat(actual.periodFrom()).isEqualTo(periodFrom);
+        assertThat(actual.periodTo()).isEqualTo(periodTo);
     }
 
 }
