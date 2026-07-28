@@ -4,7 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -77,19 +80,19 @@ public class WorkspaceControllerTest {
 
     @Test
     void shouldReturnNotFound_whenGetWithInvalidId() {
-        Long invalid_id = -1L;
-        when(workspaceService.getWorkspaceById(invalid_id))
-                .thenThrow(new WorkspaceNotFoundException(invalid_id));
+        Long invalidId = 999L;
+        when(workspaceService.getWorkspaceById(invalidId))
+                .thenThrow(new WorkspaceNotFoundException(invalidId));
 
-        ProblemDetail response = restTestClient.get().uri("/api/workspaces/-1")
+        ProblemDetail response = restTestClient.get().uri("/api/workspaces/999")
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ProblemDetail.class)
                 .returnResult()
                 .getResponseBody();
 
-        assertThat(response.getDetail()).isEqualTo("Workspace with id -1 not found!");
-        assertThat(response.getInstance()).isEqualTo(URI.create("/api/workspaces/-1"));
+        assertThat(response.getDetail()).isEqualTo("Workspace with id 999 not found!");
+        assertThat(response.getInstance()).isEqualTo(URI.create("/api/workspaces/999"));
         assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
         assertThat(response.getTitle()).isEqualTo(HttpStatus.NOT_FOUND.getReasonPhrase());
     }
@@ -131,4 +134,48 @@ public class WorkspaceControllerTest {
         assertThat(actual.periodTo()).isEqualTo(periodTo);
     }
 
+    @Test
+    void shouldReturnUpdated_whenPutWithValidIdAndRequest() {
+        Instant createdAt = LocalDateTime.of(2020, 1, 20, 14, 30).toInstant(ZoneOffset.UTC);
+        long id = 1L;
+        WorkspaceResponse current = WorkspaceResponse.builder()
+                .id(id)
+                .name("oldWorkspace")
+                .periodFrom(LocalDate.of(2000, 9, 1))
+                .periodTo(LocalDate.of(2001, 9, 1))
+                .createdAt(createdAt)
+                .updatedAt(createdAt)
+                .build();
+        String updatedName = "updatedWorkspace";
+        LocalDate updatedPeriodFrom = LocalDate.of(2020, 2, 1);
+        LocalDate updatedPeriodTo = LocalDate.of(2021, 2, 1);
+        WorkspaceRequest updateRequest = WorkspaceRequest.builder()
+                .name(updatedName)
+                .periodFrom(updatedPeriodFrom)
+                .periodTo(updatedPeriodTo)
+                .build();
+        WorkspaceResponse updated = WorkspaceResponse.builder()
+                .name(updatedName)
+                .periodFrom(updatedPeriodFrom)
+                .periodTo(updatedPeriodTo)
+                .createdAt(createdAt)
+                .updatedAt(LocalDateTime.of(2020, 1, 20, 14, 40).toInstant(ZoneOffset.UTC))
+                .build();
+        when(workspaceService.getWorkspaceById(id)).thenReturn(current);
+        when(workspaceService.updateWorkspace(id, updateRequest)).thenReturn(updated);
+
+        WorkspaceResponse actual = restTestClient.put().uri("/api/workspaces/{id}", id)
+                .body(updateRequest)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(WorkspaceResponse.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(actual.name()).isEqualTo(updatedName);
+        assertThat(actual.periodFrom()).isEqualTo(updatedPeriodFrom);
+        assertThat(actual.periodTo()).isEqualTo(updatedPeriodTo);
+        assertThat(actual.createdAt()).isEqualTo(createdAt); // createdAt should not change
+        assertThat(actual.updatedAt()).isAfter(createdAt);   // updatedAt should be later than initial creation
+    }
 }
