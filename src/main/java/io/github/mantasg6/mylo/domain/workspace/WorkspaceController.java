@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 
@@ -59,7 +60,7 @@ public class WorkspaceController {
      * @return HTTP response 201 with the created workspace in the body.
      */
     @PostMapping()
-    public ResponseEntity<WorkspaceResponse> createWorkspace(@RequestBody WorkspaceRequest request) {
+    public ResponseEntity<WorkspaceResponse> createWorkspace(@RequestBody @Valid WorkspaceRequest request) {
         WorkspaceResponse created = workspaceService.createWorkspace(request);
 
         URI location = ServletUriComponentsBuilder

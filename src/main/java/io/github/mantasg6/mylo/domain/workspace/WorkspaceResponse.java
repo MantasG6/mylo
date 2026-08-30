@@ -16,8 +16,8 @@ public record WorkspaceResponse(
     Long id,
     String name,
     List<Widget> widgets,
-    LocalDate periodFrom,
-    LocalDate periodTo,
+    LocalDate periodStart,
+    LocalDate periodEnd,
     Instant createdAt,
     Instant updatedAt
 ) { }

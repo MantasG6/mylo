@@ -33,10 +33,10 @@ public class Workspace extends BaseEntity {
     )
     private List<Widget> widgets = new ArrayList<>();
 
-    @Column(name = "period_from")
-    private LocalDate periodFrom;
+    @Column(name = "period_start")
+    private LocalDate periodStart;
 
-    @Column(name = "period_to")
-    private LocalDate periodTo;
+    @Column(name = "period_end")
+    private LocalDate periodEnd;
 
 }
