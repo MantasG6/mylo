@@ -1,6 +1,23 @@
 spring:
+  config:
+    import: optional:secrets.yaml
+
   application:
     name: mylo
+
   mvc:
     problemdetails:
       enabled: true
+
+  # Database configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mylo
+
+  # Hibernate and JPA configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
