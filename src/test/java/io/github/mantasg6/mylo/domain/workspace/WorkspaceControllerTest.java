@@ -225,4 +225,27 @@ public class WorkspaceControllerTest {
         assertThat(actual.createdAt()).isEqualTo(createdAt); // createdAt should not change
         assertThat(actual.updatedAt()).isAfter(createdAt);   // updatedAt should be later than initial creation
     }
+
+    @Test
+    void shouldReturnBadRequest_whenPeriodStartInFuture() {
+        WorkspaceRequest workspaceRequest = WorkspaceRequest.builder()
+                .name("Workspace")
+                .periodStart(LocalDate.now().plusDays(1))
+                .periodEnd(LocalDate.now().plusDays(1))
+                .build();
+
+        ValidationProblemDetail actual = restTestClient.post().uri("/api/workspaces")
+        .body(workspaceRequest)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectBody(ValidationProblemDetail.class)
+        .returnResult()
+        .getResponseBody();
+
+        assertThat(actual.getDetail()).isEqualTo("Validation failed");
+        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/workspaces"));
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        assertThat(actual.getErrors()).containsEntry("periodStart", "Period start cannot be in the future");
+    }
 }
