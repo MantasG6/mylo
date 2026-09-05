@@ -82,7 +82,7 @@ public class WorkspaceController {
     @PutMapping("/{id}")
     public ResponseEntity<WorkspaceResponse> updateWorkspace(
             @PathVariable Long id,
-            @RequestBody WorkspaceRequest request) {
+            @RequestBody @Valid WorkspaceRequest request) {
         return ResponseEntity.ok(workspaceService.updateWorkspace(id, request));
     }
 
