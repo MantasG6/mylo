@@ -156,7 +156,7 @@ public class WorkspaceControllerTest {
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/workspaces"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("name", "Workspace name cannot be blank");
+        assertThat(actual.getErrors()).containsEntry("name", "Workspace name length must be 1-20 characters");
         assertThat(actual.getErrors()).containsEntry("periodStart", "The start of the period must be provided");
         assertThat(actual.getErrors()).containsEntry("periodEnd", "The end of the period must be provided");
     }
