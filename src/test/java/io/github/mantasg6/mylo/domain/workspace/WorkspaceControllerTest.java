@@ -162,6 +162,29 @@ public class WorkspaceControllerTest {
     }
 
     @Test
+    void shouldReturnBadRequest_whenNameTooLong() {
+        WorkspaceRequest invalidRequest = WorkspaceRequest.builder()
+                .name("The workspace with a name that is a bit too long")
+                .periodStart(LocalDate.now())
+                .periodEnd(LocalDate.now())
+                .build();
+
+        ValidationProblemDetail actual = restTestClient.post().uri("/api/workspaces")
+                .body(invalidRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ValidationProblemDetail.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(actual.getDetail()).isEqualTo("Validation failed");
+        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/workspaces"));
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        assertThat(actual.getErrors()).containsEntry("name", "Workspace name length must be 1-20 characters");
+    }
+
+    @Test
     void shouldReturnBadRequest_whenPeriodStartIsAfterPeriodEnd() {
         WorkspaceRequest invalidRequest = WorkspaceRequest.builder()
                 .name("invalidWorkspaceName")
@@ -194,17 +217,17 @@ public class WorkspaceControllerTest {
                 .updatedAt(createdAt)
                 .build();
         String updatedName = "updatedWorkspace";
-        LocalDate updatedPeriodFrom = LocalDate.of(2020, 2, 1);
-        LocalDate updatedPeriodTo = LocalDate.of(2021, 2, 1);
+        LocalDate updatedPeriodStart = LocalDate.of(2020, 2, 1);
+        LocalDate updatedPeriodEnd = LocalDate.of(2021, 2, 1);
         WorkspaceRequest updateRequest = WorkspaceRequest.builder()
                 .name(updatedName)
-                .periodStart(updatedPeriodFrom)
-                .periodEnd(updatedPeriodTo)
+                .periodStart(updatedPeriodStart)
+                .periodEnd(updatedPeriodEnd)
                 .build();
         WorkspaceResponse updated = WorkspaceResponse.builder()
                 .name(updatedName)
-                .periodStart(updatedPeriodFrom)
-                .periodEnd(updatedPeriodTo)
+                .periodStart(updatedPeriodStart)
+                .periodEnd(updatedPeriodEnd)
                 .createdAt(createdAt)
                 .updatedAt(LocalDateTime.of(2020, 1, 20, 14, 40).toInstant(ZoneOffset.UTC))
                 .build();
@@ -220,8 +243,51 @@ public class WorkspaceControllerTest {
                 .getResponseBody();
 
         assertThat(actual.name()).isEqualTo(updatedName);
-        assertThat(actual.periodStart()).isEqualTo(updatedPeriodFrom);
-        assertThat(actual.periodEnd()).isEqualTo(updatedPeriodTo);
+        assertThat(actual.periodStart()).isEqualTo(updatedPeriodStart);
+        assertThat(actual.periodEnd()).isEqualTo(updatedPeriodEnd);
+        assertThat(actual.createdAt()).isEqualTo(createdAt); // createdAt should not change
+        assertThat(actual.updatedAt()).isAfter(createdAt);   // updatedAt should be later than initial creation
+    }
+
+    @Test
+    void shouldReturnUpdated_whenPutWithValidIdAndPartialRequest() {
+        Instant createdAt = LocalDateTime.of(2020, 1, 20, 14, 30).toInstant(ZoneOffset.UTC);
+        long id = 1L;
+        String workspaceName = "workspace";
+        LocalDate periodStart = LocalDate.of(2020, 2, 1);
+        WorkspaceResponse current = WorkspaceResponse.builder()
+                .id(id)
+                .name(workspaceName)
+                .periodStart(periodStart)
+                .periodEnd(LocalDate.of(2001, 9, 1))
+                .createdAt(createdAt)
+                .updatedAt(createdAt)
+                .build();
+        LocalDate updatedPeriodEnd = LocalDate.of(2021, 2, 1);
+        WorkspaceRequest updateRequest = WorkspaceRequest.builder()
+                .periodEnd(updatedPeriodEnd)
+                .build();
+        WorkspaceResponse updated = WorkspaceResponse.builder()
+                .name(workspaceName)
+                .periodStart(periodStart)
+                .periodEnd(updatedPeriodEnd)
+                .createdAt(createdAt)
+                .updatedAt(LocalDateTime.of(2020, 1, 20, 14, 40).toInstant(ZoneOffset.UTC))
+                .build();
+        when(workspaceService.getWorkspaceById(id)).thenReturn(current);
+        when(workspaceService.updateWorkspace(id, updateRequest)).thenReturn(updated);
+
+        WorkspaceResponse actual = restTestClient.put().uri("/api/workspaces/{id}", id)
+                .body(updateRequest)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(WorkspaceResponse.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(actual.name()).isEqualTo(workspaceName);
+        assertThat(actual.periodStart()).isEqualTo(periodStart);
+        assertThat(actual.periodEnd()).isEqualTo(updatedPeriodEnd);
         assertThat(actual.createdAt()).isEqualTo(createdAt); // createdAt should not change
         assertThat(actual.updatedAt()).isAfter(createdAt);   // updatedAt should be later than initial creation
     }
@@ -235,12 +301,12 @@ public class WorkspaceControllerTest {
                 .build();
 
         ValidationProblemDetail actual = restTestClient.post().uri("/api/workspaces")
-        .body(workspaceRequest)
-        .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody(ValidationProblemDetail.class)
-        .returnResult()
-        .getResponseBody();
+                .body(workspaceRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ValidationProblemDetail.class)
+                .returnResult()
+                .getResponseBody();
 
         assertThat(actual.getDetail()).isEqualTo("Validation failed");
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/workspaces"));
