@@ -48,14 +48,14 @@ public class WorkspaceControllerTest {
         when(workspaceService.getAllWorkspaces())
                 .thenReturn(workspaces);
 
-        List<WorkspaceResponse> response = restTestClient.get().uri("/api/workspaces")
+        List<WorkspaceResponse> actual = restTestClient.get().uri("/api/workspaces")
             .exchange()
             .expectStatus().isOk()
             .expectBody(new ParameterizedTypeReference<List<WorkspaceResponse>>() {})
             .returnResult()
             .getResponseBody();
 
-        assertThat(response).hasSize(3);
+        assertThat(actual).hasSize(3);
     }
 
     @Test
@@ -68,16 +68,16 @@ public class WorkspaceControllerTest {
         when(workspaceService.getWorkspaceById(1L))
                 .thenReturn(expected);
 
-        WorkspaceResponse response = restTestClient.get().uri("/api/workspaces/1")
+        WorkspaceResponse actual = restTestClient.get().uri("/api/workspaces/1")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(WorkspaceResponse.class)
                 .returnResult()
                 .getResponseBody();
 
-        assertThat(response.name()).isEqualTo("expectedWorkspace");
-        assertThat(response.periodStart()).isEqualTo(LocalDate.of(2020, 06, 20));
-        assertThat(response.periodEnd()).isEqualTo(LocalDate.of(2020, 06, 21));
+        assertThat(actual.name()).isEqualTo("expectedWorkspace");
+        assertThat(actual.periodStart()).isEqualTo(LocalDate.of(2020, 06, 20));
+        assertThat(actual.periodEnd()).isEqualTo(LocalDate.of(2020, 06, 21));
     }
 
     @Test
@@ -86,17 +86,17 @@ public class WorkspaceControllerTest {
         when(workspaceService.getWorkspaceById(invalidId))
                 .thenThrow(new WorkspaceNotFoundException(invalidId));
 
-        ProblemDetail response = restTestClient.get().uri("/api/workspaces/999")
+        ProblemDetail actual = restTestClient.get().uri("/api/workspaces/999")
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ProblemDetail.class)
                 .returnResult()
                 .getResponseBody();
 
-        assertThat(response.getDetail()).isEqualTo("Workspace with id 999 not found!");
-        assertThat(response.getInstance()).isEqualTo(URI.create("/api/workspaces/999"));
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
-        assertThat(response.getTitle()).isEqualTo(HttpStatus.NOT_FOUND.getReasonPhrase());
+        assertThat(actual.getDetail()).isEqualTo("Workspace with id 999 not found!");
+        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/workspaces/999"));
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        assertThat(actual.getTitle()).isEqualTo(HttpStatus.NOT_FOUND.getReasonPhrase());
     }
 
     @Test
@@ -162,7 +162,7 @@ public class WorkspaceControllerTest {
     }
 
     @Test
-    void shouldReturnBadRequest_whenNameTooLong() {
+    void shouldReturnBadRequest_whenPostWithNameTooLong() {
         WorkspaceRequest invalidRequest = WorkspaceRequest.builder()
                 .name("The workspace with a name that is a bit too long")
                 .periodStart(LocalDate.now())
@@ -185,7 +185,7 @@ public class WorkspaceControllerTest {
     }
 
     @Test
-    void shouldReturnBadRequest_whenPeriodStartIsAfterPeriodEnd() {
+    void shouldReturnBadRequest_whenPostWithPeriodStartAfterPeriodEnd() {
         WorkspaceRequest invalidRequest = WorkspaceRequest.builder()
                 .name("invalidWorkspaceName")
                 .periodStart(LocalDate.of(2000, 11, 3))
@@ -202,6 +202,29 @@ public class WorkspaceControllerTest {
 
         assertThat(actual.getErrors()).containsEntry("workspaceRequest",
                 "The start of the period cannot be after the end of the period");
+    }
+
+    @Test
+    void shouldReturnBadRequest_whenPostWithPeriodStartInFuture() {
+        WorkspaceRequest workspaceRequest = WorkspaceRequest.builder()
+                .name("Workspace")
+                .periodStart(LocalDate.now().plusDays(1))
+                .periodEnd(LocalDate.now().plusDays(1))
+                .build();
+
+        ValidationProblemDetail actual = restTestClient.post().uri("/api/workspaces")
+                .body(workspaceRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ValidationProblemDetail.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(actual.getDetail()).isEqualTo("Validation failed");
+        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/workspaces"));
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        assertThat(actual.getErrors()).containsEntry("periodStart", "Period start cannot be in the future");
     }
 
     @Test
@@ -250,7 +273,7 @@ public class WorkspaceControllerTest {
     }
 
     @Test
-    void shouldReturnUpdated_whenPutWithValidIdAndPartialRequest() {
+    void shouldReturnUpdated_whenPutWithPartialRequest() {
         Instant createdAt = LocalDateTime.of(2020, 1, 20, 14, 30).toInstant(ZoneOffset.UTC);
         long id = 1L;
         String workspaceName = "workspace";
@@ -293,25 +316,38 @@ public class WorkspaceControllerTest {
     }
 
     @Test
-    void shouldReturnBadRequest_whenPeriodStartInFuture() {
-        WorkspaceRequest workspaceRequest = WorkspaceRequest.builder()
-                .name("Workspace")
-                .periodStart(LocalDate.now().plusDays(1))
-                .periodEnd(LocalDate.now().plusDays(1))
+    void shouldReturnBadRequest_whenPutWithPeriodStartInFuture() {
+        Instant createdAt = LocalDateTime.of(2020, 1, 20, 14, 30).toInstant(ZoneOffset.UTC);
+        long id = 1L;
+        String workspaceName = "workspace";
+        LocalDate periodEnd = LocalDate.of(2020, 2, 10);
+        WorkspaceResponse current = WorkspaceResponse.builder()
+                .id(id)
+                .name(workspaceName)
+                .periodStart(LocalDate.of(2020, 2, 1))
+                .periodEnd(periodEnd)
+                .createdAt(createdAt)
+                .updatedAt(createdAt)
                 .build();
+        LocalDate updatedPeriodStart = LocalDate.of(2020, 2, 11);
+        WorkspaceRequest updateRequest = WorkspaceRequest.builder()
+                .periodStart(updatedPeriodStart)
+                .build();
+        when(workspaceService.getWorkspaceById(id)).thenReturn(current);
+        when(workspaceService.updateWorkspace(id, updateRequest))
+                .thenThrow(new WorkspacePeriodException(WorkspaceErrorMessage.PERIOD_START_AFTER_END));
 
-        ValidationProblemDetail actual = restTestClient.post().uri("/api/workspaces")
-                .body(workspaceRequest)
+        ProblemDetail actual = restTestClient.put().uri("/api/workspaces/{id}", id)
+                .body(updateRequest)
                 .exchange()
                 .expectStatus().isBadRequest()
-                .expectBody(ValidationProblemDetail.class)
+                .expectBody(ProblemDetail.class)
                 .returnResult()
                 .getResponseBody();
 
-        assertThat(actual.getDetail()).isEqualTo("Validation failed");
-        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/workspaces"));
+        assertThat(actual.getDetail()).isEqualTo("Workspace period start cannot be after the period end!");
+        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/workspaces/1"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("periodStart", "Period start cannot be in the future");
     }
 }

@@ -9,7 +9,7 @@ import io.github.mantasg6.mylo.core.exception.EntityNotFoundException;
 public class WorkspaceNotFoundException extends EntityNotFoundException {
 
     public WorkspaceNotFoundException(Long id) {
-        super(WorkspaceErrorMessage.notFound(id));
+        super(WorkspaceErrorMessage.NOT_FOUND(id));
     }
 
 }

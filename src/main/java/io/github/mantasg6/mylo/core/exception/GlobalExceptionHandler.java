@@ -25,10 +25,10 @@ public class GlobalExceptionHandler {
     private static final String VALIDATION_FAILED = "Validation failed";
 
     /**
-     * A generic exception handler for all entity not found exceptions.
+     * Generic exception handler for all entity not found exceptions.
      *
      * @param ex Exception to be handled.
-     * @return A standard problem details response with a 404 result code.
+     * @return Standard problem details response with a 404 result code.
      */
     @ExceptionHandler(EntityNotFoundException.class)
     public ProblemDetail handleEntityNotFound(EntityNotFoundException ex) {
@@ -36,6 +36,12 @@ public class GlobalExceptionHandler {
             HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    /**
+     * Exception handler to handle the validation errors in the application requests.
+     *
+     * @param ex Validation exception that is handled.
+     * @return Problem details response extended with the validation error map and a result code of 400.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ValidationProblemDetail handleValidation(MethodArgumentNotValidException ex) {
         ValidationProblemDetail problemDetail = new ValidationProblemDetail(HttpStatus.BAD_REQUEST.value());
@@ -50,5 +56,16 @@ public class GlobalExceptionHandler {
                 ));
         problemDetail.setErrors(errors);
         return problemDetail;
+    }
+
+    /**
+     * Exception handler to handle all the common application failures.
+     *
+     * @param ex Custom exception that represents a common application failure.
+     * @return Response containing problem details and 400 result code.
+     */
+    @ExceptionHandler(CommonApplicationException.class)
+    public ProblemDetail handleCommonFailures(CommonApplicationException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 }

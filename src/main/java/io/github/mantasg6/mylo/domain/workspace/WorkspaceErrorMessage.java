@@ -12,8 +12,10 @@ public class WorkspaceErrorMessage {
      * @param id ID of the workspace that was not found.
      * @return A message to inform customer that the requested workspace was not found.
      */
-    public static final String notFound(Long id) {
+    public static final String NOT_FOUND(Long id) {
         return String.format("Workspace with id %d not found!", id);
     }
+
+    public static final String PERIOD_START_AFTER_END = "Workspace period start cannot be after the period end!";
 
 }
