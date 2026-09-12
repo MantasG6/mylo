@@ -39,4 +39,14 @@ public class Workspace extends BaseEntity {
     @Column(name = "period_end")
     private LocalDate periodEnd;
 
+    /**
+     * Helper method to add a Widget to the Workspace.
+     * This method keeps consistency on both sides.
+     *
+     * @param widget Widget to add.
+     */
+    public void addWidget(Widget widget) {
+        widgets.add(widget);
+        widget.setWorkspace(this);
+    }
 }

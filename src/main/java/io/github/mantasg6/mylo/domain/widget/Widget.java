@@ -2,6 +2,7 @@ package io.github.mantasg6.mylo.domain.widget;
 
 import io.github.mantasg6.mylo.core.database.BaseEntity;
 import io.github.mantasg6.mylo.domain.workspace.Workspace;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Inheritance;
@@ -27,5 +28,6 @@ public class Widget extends BaseEntity {
     @JoinColumn(name = "workspace_id", nullable = false)
     private Workspace workspace;
 
-    private int position;
+    @Column(nullable = false)
+    private Integer position;
 }

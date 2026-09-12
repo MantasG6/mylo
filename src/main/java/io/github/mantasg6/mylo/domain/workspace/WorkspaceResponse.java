@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
-import io.github.mantasg6.mylo.domain.widget.Widget;
+import io.github.mantasg6.mylo.domain.widget.WidgetResponse;
 import lombok.Builder;
 
 /**
@@ -15,7 +15,7 @@ import lombok.Builder;
 public record WorkspaceResponse(
     Long id,
     String name,
-    List<Widget> widgets,
+    List<WidgetResponse> widgets,
     LocalDate periodStart,
     LocalDate periodEnd,
     Instant createdAt,

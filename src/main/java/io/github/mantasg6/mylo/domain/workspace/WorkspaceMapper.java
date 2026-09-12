@@ -4,11 +4,16 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
+import io.github.mantasg6.mylo.domain.widget.WidgetMapper;
+
 /**
  * Mapper to convert Workspace DTO to Entity and vice versa.
  *
  */
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(
+    componentModel = MappingConstants.ComponentModel.SPRING,
+    uses = WidgetMapper.class
+)
 public interface WorkspaceMapper {
 
     /**
