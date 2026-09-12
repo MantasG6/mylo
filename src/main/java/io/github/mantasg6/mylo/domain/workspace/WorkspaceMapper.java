@@ -27,5 +27,6 @@ public interface WorkspaceMapper {
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "widgets", ignore = true)
     Workspace toEntity(WorkspaceRequest dto);
 }
