@@ -33,7 +33,7 @@ import io.github.mantasg6.mylo.core.exception.ValidationProblemDetail;
 public class WorkspaceControllerTest {
 
     @Autowired
-    RestTestClient restTestClient;
+    private RestTestClient restTestClient;
 
     @MockitoBean
     private WorkspaceService workspaceService;
