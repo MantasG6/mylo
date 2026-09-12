@@ -67,7 +67,12 @@ public class WorkspaceService {
         Optional.ofNullable(request.periodEnd()).ifPresent(workspace::setPeriodEnd);
 
         if (workspace.getPeriodStart().isAfter(workspace.getPeriodEnd())) {
-            throw new WorkspacePeriodException(WorkspaceErrorMessage.PERIOD_START_AFTER_END);
+            throw new WorkspacePeriodException(
+                WorkspaceErrorMessage.PERIOD_START_AFTER_END(
+                    workspace.getPeriodStart(),
+                    workspace.getPeriodEnd()
+                )
+            );
         }
 
         return workspaceMapper.toDto(workspaceRepository.save(workspace));

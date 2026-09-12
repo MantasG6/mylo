@@ -93,7 +93,7 @@ public class WorkspaceController {
      * Delete a user workspace.
      *
      * @param id ID of the user workspace to delete.
-     * @return 204 repsonce entity.
+     * @return HTTP 204.
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWorkspace(@PathVariable Long id) {

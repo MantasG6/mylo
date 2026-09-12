@@ -335,7 +335,12 @@ public class WorkspaceControllerTest {
                 .build();
         when(workspaceService.getWorkspaceById(id)).thenReturn(current);
         when(workspaceService.updateWorkspace(id, updateRequest))
-                .thenThrow(new WorkspacePeriodException(WorkspaceErrorMessage.PERIOD_START_AFTER_END));
+                .thenThrow(new WorkspacePeriodException(
+                WorkspaceErrorMessage.PERIOD_START_AFTER_END(
+                    updatedPeriodStart,
+                    periodEnd
+                )
+            ));
 
         ProblemDetail actual = restTestClient.put().uri("/api/workspaces/{id}", id)
                 .body(updateRequest)
@@ -345,7 +350,8 @@ public class WorkspaceControllerTest {
                 .returnResult()
                 .getResponseBody();
 
-        assertThat(actual.getDetail()).isEqualTo("Workspace period start cannot be after the period end!");
+        assertThat(actual.getDetail())
+            .isEqualTo("Workspace period start (2020-02-11) cannot be after the period end(2020-02-10)!");
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/workspaces/1"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
