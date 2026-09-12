@@ -1,9 +1,12 @@
 package io.github.mantasg6.mylo.core.exception;
 
+import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 /**
  * An exception handler to deal with all the application exceptions.
  *
@@ -21,8 +26,28 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     private static final String INVALID_VALUE = "Invalid value";
     private static final String VALIDATION_FAILED = "Validation failed";
+
+    /**
+     * Catch unexpected exceptions.
+     *
+     * @param ex Any exception that has not been caught yet.
+     * @param request Request details.
+     * @return Problem Detail containing a clean result for user.
+     */
+    @ExceptionHandler(Exception.class)
+    public ProblemDetail handleUnexpected(Exception ex, HttpServletRequest request) {
+        log.error("Unhandled exception on {} {}", request.getMethod(), request.getRequestURI(), ex);
+
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+                HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
+        problem.setInstance(URI.create(request.getRequestURI()));
+
+        return problem;
+    }
 
     /**
      * Generic exception handler for all entity not found exceptions.
