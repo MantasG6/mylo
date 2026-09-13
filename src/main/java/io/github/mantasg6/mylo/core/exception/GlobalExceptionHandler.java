@@ -1,6 +1,7 @@
 package io.github.mantasg6.mylo.core.exception;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -11,12 +12,14 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.servlet.http.HttpServletRequest;
+import tools.jackson.databind.exc.InvalidFormatException;
 
 /**
  * An exception handler to deal with all the application exceptions.
@@ -30,6 +33,26 @@ public class GlobalExceptionHandler {
 
     private static final String INVALID_VALUE = "Invalid value";
     private static final String VALIDATION_FAILED = "Validation failed";
+    private static final String INVALID_JSON = "Invalid JSON request";
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ValidationProblemDetail handleUnreadable(HttpMessageNotReadableException ex) {
+        ValidationProblemDetail problemDetail = new ValidationProblemDetail(HttpStatus.BAD_REQUEST.value());
+        problemDetail.setTitle(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        problemDetail.setDetail(INVALID_JSON);
+
+        Map<String, String> errors = new HashMap<>();
+
+        if (ex.getCause() instanceof InvalidFormatException ife && !ife.getPath().isEmpty()) {
+            String field = ife.getPath().get(0).getPropertyName();
+            String expectedType = ife.getTargetType().getSimpleName();
+            errors.put(field, "must be a valid " + expectedType.toLowerCase());
+        }
+
+        problemDetail.setErrors(errors);
+
+        return problemDetail;
+    }
 
     /**
      * Catch unexpected exceptions.
