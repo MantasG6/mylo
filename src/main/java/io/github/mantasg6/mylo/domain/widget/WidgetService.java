@@ -56,6 +56,10 @@ public class WidgetService {
         Workspace workspace = workspaceRepository.findById(request.workspaceId())
                 .orElseThrow(() -> new WorkspaceNotFoundException(request.workspaceId()));
 
+        if(workspace.getWidgets().stream().anyMatch(w -> w.getPosition() == request.position())) {
+            throw new WidgetPositionException(workspace.getId(), request.position());
+        }
+
         workspace.addWidget(widget);
 
         return widgetMapper.toDto(widgetRepository.save(widget));
@@ -71,7 +75,17 @@ public class WidgetService {
     public WidgetResponse updateWidget(Long id, WidgetRequest request) {
         Widget widget = widgetRepository.findById(id).orElseThrow(() -> new WidgetNotFoundException(id));
 
-        Optional.of(request.position()).ifPresent(widget::setPosition);
+        Long workspaceId = request.workspaceId() != null ? request.workspaceId() : widget.getWorkspace().getId();
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new WorkspaceNotFoundException(workspaceId));
+
+        widget.setWorkspace(workspace);
+        Optional.of(request.position()).ifPresent(position -> {
+            if(workspace.getWidgets().stream().anyMatch(w -> w.getPosition() == request.position())) {
+                throw new WidgetPositionException(workspace.getId(), request.position());
+            }
+            widget.setPosition(position);
+        });
 
         return widgetMapper.toDto(widgetRepository.save(widget));
     }

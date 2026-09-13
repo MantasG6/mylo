@@ -20,6 +20,10 @@ public record WidgetRequest(
         message = "Widget position must be greater than 0",
         groups = {OnCreate.class, OnUpdate.class}
     )
+    @NotNull(
+        message = "Widget position is required",
+        groups = {OnCreate.class}
+    )
     Integer position
 ) {
     public interface OnCreate {}

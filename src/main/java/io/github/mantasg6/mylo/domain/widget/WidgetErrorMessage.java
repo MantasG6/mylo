@@ -15,4 +15,8 @@ public class WidgetErrorMessage {
     public static final String WIDGET_NOT_FOUND(Long id) {
         return String.format("Widget with id %d not found!", id);
     }
+
+    public static final String POSITION_TAKEN(Long workspaceId, Integer position) {
+        return String.format("Position %d is already taken in Workspace with id %d.", position, workspaceId);
+    }
 }
