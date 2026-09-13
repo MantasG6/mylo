@@ -80,7 +80,7 @@ public class WidgetService {
                 .orElseThrow(() -> new WorkspaceNotFoundException(workspaceId));
 
         widget.setWorkspace(workspace);
-        Optional.of(request.position()).ifPresent(position -> {
+        Optional.ofNullable(request.position()).ifPresent(position -> {
             if(workspace.getWidgets().stream().anyMatch(w -> w.getPosition() == request.position())) {
                 throw new WidgetPositionException(workspace.getId(), request.position());
             }
