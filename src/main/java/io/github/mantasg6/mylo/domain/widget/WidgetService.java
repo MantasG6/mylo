@@ -51,7 +51,7 @@ public class WidgetService {
         Widget widget = widgetRepository.findById(id)
                 .orElseThrow(() -> new WidgetNotFoundException(id));
         WidgetContentHandler<?> handler = handlers.get(widget.getType());
-        return null;
+        return handler.loadContent(widget);
     }
 
     /**

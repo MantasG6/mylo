@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import io.github.mantasg6.mylo.domain.goal.GoalMapper;
 import io.github.mantasg6.mylo.domain.goal.GoalResponse;
+import io.github.mantasg6.mylo.domain.widget.Widget;
 import io.github.mantasg6.mylo.domain.widget.WidgetContentHandler;
 import io.github.mantasg6.mylo.domain.widget.WidgetMapper;
 import io.github.mantasg6.mylo.domain.widget.WidgetRequest;
@@ -44,9 +45,15 @@ public class GoalWidgetContentHandler implements WidgetContentHandler<GoalRespon
 	}
 
 	@Override
+	public WidgetResponse<GoalResponse> loadContent(Widget widget) {
+        GoalWidget goalWidget = goalWidgetRepository.findByWidget(widget)
+                .orElseThrow(() -> new GoalWidgetNotFoundException(widget.getId()));
+        return widgetMapper.toDto(widget, goalMapper.toDto(goalWidget.getGoal()));
+	}
+
+	@Override
 	public WidgetResponse<GoalResponse> createContent(WidgetRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
