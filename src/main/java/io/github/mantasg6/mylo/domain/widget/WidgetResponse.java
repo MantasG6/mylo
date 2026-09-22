@@ -9,10 +9,11 @@ import lombok.Builder;
  *
  */
 @Builder
-public record WidgetResponse(
+public record WidgetResponse<T>(
     Long id,
     Long workspaceId,
     Integer position,
     Instant createdAt,
-    Instant updatedAt
+    Instant updatedAt,
+    T content
 ) {}

@@ -24,7 +24,13 @@ public record WidgetRequest(
         message = "Widget position is required",
         groups = {OnCreate.class}
     )
-    Integer position
+    Integer position,
+
+    @NotNull(
+        message = "Widget must have a reference to content",
+        groups = {OnCreate.class, OnUpdate.class}
+    )
+    Long contentId
 ) {
     public interface OnCreate {}
     public interface OnUpdate {}

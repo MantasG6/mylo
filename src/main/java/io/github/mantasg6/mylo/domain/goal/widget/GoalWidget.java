@@ -1,6 +1,7 @@
-package io.github.mantasg6.mylo.domain.goal;
+package io.github.mantasg6.mylo.domain.goal.widget;
 
 import io.github.mantasg6.mylo.core.database.BaseEntity;
+import io.github.mantasg6.mylo.domain.goal.Goal;
 import io.github.mantasg6.mylo.domain.widget.Widget;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

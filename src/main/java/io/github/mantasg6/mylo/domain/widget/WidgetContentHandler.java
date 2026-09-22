@@ -1,22 +1,36 @@
 package io.github.mantasg6.mylo.domain.widget;
 
+import java.util.List;
+
 /**
  * Handles content management for different types of widgets.
  *
  */
-public interface WidgetContentHandler<TRequest, TResponse> {
+public interface WidgetContentHandler<T> {
     /**
      * Returns the supported Widget type.
      */
     WidgetType getType();
+
     /**
      * Builds and returns the Widget content.
+     *
+     * @param widget Base widget features.
      */
-    TResponse loadContent();
+    List<WidgetResponse<T>> loadAllContent();
+
+    /**
+     * Builds and returns details of a single Widget.
+     *
+     * @param widget The Widget to build and return details for.
+     */
+    WidgetResponse<T> loadContent(Widget widget);
+
     /**
      * Creates a Widget with details specified in the request.
      *
-     * @param request Details of the Widget to be created.
+     * @param baseRequest Common Widget features.
+     * @param request Features specific to the Widget.
      */
-    TResponse createContent(TRequest request);
+    WidgetResponse<T> createContent(WidgetRequest request);
 }
