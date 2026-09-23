@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,8 +17,8 @@ import lombok.Setter;
  * Goal Widget intermediary table that helps to map Goal Widgets to user workspaces.
  *
  */
-@Setter
-@Getter
+@Setter @Getter
+@AllArgsConstructor
 @Entity
 @Table(name = "goal_widgets")
 public class GoalWidget extends BaseEntity {

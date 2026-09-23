@@ -1,5 +1,7 @@
 package io.github.mantasg6.mylo.domain.widget;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Builder;
@@ -15,6 +17,13 @@ public record WidgetRequest(
         groups = OnCreate.class
     )
     Long workspaceId,
+
+    @NotNull(
+        message = "Widget must have a type",
+        groups = OnCreate.class
+    )
+    @Enumerated(EnumType.STRING)
+    WidgetType type,
 
     @Positive(
         message = "Widget position must be greater than 0",

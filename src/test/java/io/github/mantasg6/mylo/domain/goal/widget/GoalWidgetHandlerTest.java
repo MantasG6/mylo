@@ -16,17 +16,24 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import io.github.mantasg6.mylo.domain.goal.Goal;
 import io.github.mantasg6.mylo.domain.goal.GoalMapper;
+import io.github.mantasg6.mylo.domain.goal.GoalRepository;
 import io.github.mantasg6.mylo.domain.goal.GoalResponse;
 import io.github.mantasg6.mylo.domain.widget.Widget;
-import io.github.mantasg6.mylo.domain.widget.WidgetMapper;
+import io.github.mantasg6.mylo.domain.widget.WidgetContentMapper;
 import io.github.mantasg6.mylo.domain.widget.WidgetRepository;
+import io.github.mantasg6.mylo.domain.widget.WidgetRequest;
+import io.github.mantasg6.mylo.domain.widget.WidgetRequestMapper;
 import io.github.mantasg6.mylo.domain.widget.WidgetResponse;
 import io.github.mantasg6.mylo.domain.widget.WidgetService;
 import io.github.mantasg6.mylo.domain.widget.WidgetType;
 import io.github.mantasg6.mylo.domain.workspace.Workspace;
+import io.github.mantasg6.mylo.domain.workspace.WorkspaceRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class GoalWidgetHandlerTest {
+
+    @Mock
+    private WorkspaceRepository workspaceRepository;
 
     @Mock
     private WidgetRepository widgetRepository;
@@ -34,7 +41,12 @@ public class GoalWidgetHandlerTest {
     @Mock
     private GoalWidgetRepository goalWidgetRepository;
 
-    private WidgetMapper<GoalResponse> widgetMapper;
+    @Mock
+    private GoalRepository goalRepository;
+
+    private WidgetContentMapper<GoalResponse> widgetContentMapper;
+
+    private WidgetRequestMapper widgetRequestMapper;
 
     private GoalMapper goalMapper;
 
@@ -44,10 +56,54 @@ public class GoalWidgetHandlerTest {
 
     @BeforeEach
     void setUp() {
-        widgetMapper = Mappers.getMapper(GoalWidgetMapper.class);
+        widgetContentMapper = Mappers.getMapper(GoalWidgetMapper.class);
         goalMapper = Mappers.getMapper(GoalMapper.class);
-        goalHandler = new GoalWidgetContentHandler(goalWidgetRepository, widgetMapper, goalMapper);
-        widgetService = new WidgetService(widgetRepository, List.of(goalHandler));
+        goalHandler = new GoalWidgetContentHandler(
+                goalWidgetRepository, widgetContentMapper,
+                goalRepository, goalMapper
+        );
+        widgetService = new WidgetService(
+            workspaceRepository,
+            widgetRepository,
+            widgetRequestMapper,
+            List.of(goalHandler)
+        );
+    }
+
+    @Test
+    void createWidget_returnsCreatedWidgetWithGoal_whenGoalTypeInRequest() {
+        // Set up the request and empty workspace
+        WidgetRequest request = WidgetRequest.builder()
+                .workspaceId(1L)
+                .type(WidgetType.GOAL)
+                .contentId(1L)
+                .build();
+
+        Workspace workspace = new Workspace();
+        workspace.setId(1L);
+
+        Widget widget = new Widget(workspace, 1, WidgetType.GOAL);
+        widget.setId(1L);
+
+        Goal goal = new Goal();
+        goal.setId(1L);
+        goal.setName("Goal #1");
+
+        GoalWidget goalWidget = new GoalWidget(widget, goal);
+        goalWidget.setId(1L);
+
+        when(workspaceRepository.findById(1L)).thenReturn(Optional.of(workspace));
+        when(widgetRepository.save(widget)).thenReturn(widget);
+        when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
+        when(goalWidgetRepository.findByWidget(widget)).thenReturn(Optional.of(goalWidget));
+
+        WidgetResponse<?> actual = widgetService.createWidget(request);
+
+        assertThat(actual.id()).isEqualTo(1L);
+        assertThat(actual.content()).isInstanceOf(GoalResponse.class);
+        GoalResponse actualGoal = (GoalResponse) actual.content();
+        assertThat(actualGoal.id()).isEqualTo(1L);
+        assertThat(actualGoal.name()).isEqualTo("Goal #1");
     }
 
     @Test
@@ -65,10 +121,8 @@ public class GoalWidgetHandlerTest {
         goal.setId(1L);
         goal.setName("Goal #1");
 
-        GoalWidget goalWidget = new GoalWidget();
+        GoalWidget goalWidget = new GoalWidget(widget, goal);
         goalWidget.setId(1L);
-        goalWidget.setWidget(widget);
-        goalWidget.setGoal(goal);
 
         when(goalWidgetRepository.findAll()).thenReturn(List.of(goalWidget));
 
@@ -97,10 +151,8 @@ public class GoalWidgetHandlerTest {
         goal.setId(1L);
         goal.setName("Goal #1");
 
-        GoalWidget goalWidget = new GoalWidget();
+        GoalWidget goalWidget = new GoalWidget(widget, goal);
         goalWidget.setId(1L);
-        goalWidget.setWidget(widget);
-        goalWidget.setGoal(goal);
 
         when(widgetRepository.findById(1L)).thenReturn(Optional.of(widget));
         when(goalWidgetRepository.findByWidget(widget)).thenReturn(Optional.of(goalWidget));

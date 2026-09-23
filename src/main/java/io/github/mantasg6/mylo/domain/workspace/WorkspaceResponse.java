@@ -15,7 +15,7 @@ import lombok.Builder;
 public record WorkspaceResponse(
     Long id,
     String name,
-    List<WidgetResponse> widgets,
+    List<WidgetResponse<?>> widgets,
     LocalDate periodStart,
     LocalDate periodEnd,
     Instant createdAt,

@@ -32,5 +32,5 @@ public interface WidgetContentHandler<T> {
      * @param baseRequest Common Widget features.
      * @param request Features specific to the Widget.
      */
-    WidgetResponse<T> createContent(WidgetRequest request);
+    WidgetResponse<T> createContent(Widget widget, Long contentId);
 }

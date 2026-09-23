@@ -7,22 +7,34 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import lombok.RequiredArgsConstructor;
+import io.github.mantasg6.mylo.domain.workspace.Workspace;
+import io.github.mantasg6.mylo.domain.workspace.WorkspaceNotFoundException;
+import io.github.mantasg6.mylo.domain.workspace.WorkspaceRepository;
 
 /**
  * Widget management service.
  *
  */
 @Service
-@RequiredArgsConstructor
 public class WidgetService {
+
+    private final WorkspaceRepository workspaceRepository;
 
     private final WidgetRepository widgetRepository;
 
+    private final WidgetRequestMapper widgetRequestMapper;
+
     private final Map<WidgetType, WidgetContentHandler<?>> handlers;
 
-    public WidgetService(WidgetRepository widgetRepository, List<WidgetContentHandler<?>> handlerList) {
+    public WidgetService(
+        WorkspaceRepository workspaceRepository,
+        WidgetRepository widgetRepository,
+        WidgetRequestMapper widgetRequestMapper,
+        List<WidgetContentHandler<?>> handlerList
+    ) {
+        this.workspaceRepository = workspaceRepository;
         this.widgetRepository = widgetRepository;
+        this.widgetRequestMapper = widgetRequestMapper;
         this.handlers = handlerList.stream()
                 .collect(Collectors.toMap(WidgetContentHandler::getType, h -> h));
     }
@@ -60,9 +72,16 @@ public class WidgetService {
      * @param request Request with details of the new Widget.
      * @return Response with details about the new Widget.
      */
-    public WidgetResponse createWidget(WidgetRequest request) {
-        // TODO: Implement
-        return null;
+    public WidgetResponse<?> createWidget(WidgetRequest request) {
+        Workspace workspace = workspaceRepository.findById(request.workspaceId())
+                .orElseThrow(() -> new WorkspaceNotFoundException(request.workspaceId()));
+        Widget widget = widgetRequestMapper.toEntity(request);
+
+        workspace.addWidget(widget);
+
+        Widget created = widgetRepository.save(widget);
+
+        return handlers.get(request.type()).createContent(created, request.contentId());
     }
 
     /**

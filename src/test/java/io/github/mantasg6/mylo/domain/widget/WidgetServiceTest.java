@@ -22,7 +22,7 @@ public class WidgetServiceTest {
     private WidgetRepository widgetRepository;
 
     @Mock
-    private WidgetMapper widgetMapper;
+    private WidgetContentMapper widgetContentMapper;
 
     @Mock
     private WorkspaceRepository workspaceRepository;
@@ -43,7 +43,7 @@ public class WidgetServiceTest {
         alreadyExisting.setPosition(position);
         Widget newWidget = new Widget();
         newWidget.setPosition(position);
-        when(widgetMapper.toEntity(request)).thenReturn(newWidget);
+        when(widgetContentMapper.toEntity(request)).thenReturn(newWidget);
 
         Workspace workspace = new Workspace();
         workspace.setId(workspaceId);
