@@ -2,6 +2,7 @@ package io.github.mantasg6.mylo.domain.goal.widget;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -58,6 +59,7 @@ public class GoalWidgetHandlerTest {
     void setUp() {
         widgetContentMapper = Mappers.getMapper(GoalWidgetMapper.class);
         goalMapper = Mappers.getMapper(GoalMapper.class);
+        widgetRequestMapper = Mappers.getMapper(WidgetRequestMapper.class);
         goalHandler = new GoalWidgetContentHandler(
                 goalWidgetRepository, widgetContentMapper,
                 goalRepository, goalMapper
@@ -93,12 +95,14 @@ public class GoalWidgetHandlerTest {
         goalWidget.setId(1L);
 
         when(workspaceRepository.findById(1L)).thenReturn(Optional.of(workspace));
-        when(widgetRepository.save(widget)).thenReturn(widget);
+        when(widgetRepository.save(any())).thenReturn(widget);
         when(goalRepository.findById(1L)).thenReturn(Optional.of(goal));
-        when(goalWidgetRepository.findByWidget(widget)).thenReturn(Optional.of(goalWidget));
+        when(goalWidgetRepository.save(any())).thenReturn(goalWidget);
 
+        // Execute test
         WidgetResponse<?> actual = widgetService.createWidget(request);
 
+        // Assert expected values
         assertThat(actual.id()).isEqualTo(1L);
         assertThat(actual.content()).isInstanceOf(GoalResponse.class);
         GoalResponse actualGoal = (GoalResponse) actual.content();
