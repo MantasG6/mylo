@@ -38,7 +38,7 @@ public class WidgetController {
      * @return HTTP 200 and the list of Widgets.
      */
     @GetMapping
-    public ResponseEntity<List<WidgetResponse>> getAll() {
+    public ResponseEntity<List<WidgetResponse<?>>> getAll() {
         return ResponseEntity.ok(widgetService.getAllWidgets());
     }
 
@@ -49,7 +49,7 @@ public class WidgetController {
      * @return HTTP 200 and the details of the retrieved Widget.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<WidgetResponse> getById(@PathVariable Long id) {
+    public ResponseEntity<WidgetResponse<?>> getById(@PathVariable Long id) {
         return ResponseEntity.ok(widgetService.getWidgetById(id));
     }
     
@@ -60,10 +60,10 @@ public class WidgetController {
      * @return HTTP 201 and the details of the new Widget.
      */
     @PostMapping
-    public ResponseEntity<WidgetResponse> createWidget(
+    public ResponseEntity<WidgetResponse<?>> createWidget(
         @RequestBody @Validated(OnCreate.class) WidgetRequest request
     ) {
-        WidgetResponse created = widgetService.createWidget(request);
+        WidgetResponse<?> created = widgetService.createWidget(request);
         
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
