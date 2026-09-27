@@ -33,4 +33,11 @@ public interface WidgetContentHandler<T> {
      * @param request Features specific to the Widget.
      */
     WidgetResponse<T> createContent(Widget widget, Long contentId);
+
+    /**
+     * Maps Widget entity list to Widget Response list.
+     *
+     * @param widgets List of Widgets to map.
+     */
+    List<WidgetResponse<T>> mapContentList(List<Widget> widgets);
 }

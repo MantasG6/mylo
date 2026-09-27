@@ -60,4 +60,16 @@ public class GoalWidgetContentHandler implements WidgetContentHandler<GoalRespon
         GoalWidget created = goalWidgetRepository.save(new GoalWidget(widget, goal));
 		return widgetContentMapper.toDto(created.getWidget(), goalMapper.toDto(created.getGoal()));
 	}
+
+	@Override
+	public List<WidgetResponse<GoalResponse>> mapContentList(List<Widget> widgets) {
+        List<GoalWidget> goalWidgets = goalWidgetRepository.findByWidgetIn(widgets);
+        return goalWidgets.stream()
+                .map(goalWidget -> {
+                    return widgetContentMapper.toDto(
+                            goalWidget.getWidget(),
+                            goalMapper.toDto(goalWidget.getGoal()));
+                })
+                .toList();
+	}
 }

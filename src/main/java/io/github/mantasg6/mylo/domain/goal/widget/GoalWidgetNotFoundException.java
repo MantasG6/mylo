@@ -8,6 +8,6 @@ import io.github.mantasg6.mylo.core.exception.EntityNotFoundException;
  */
 public class GoalWidgetNotFoundException extends EntityNotFoundException {
     public GoalWidgetNotFoundException(Long widgetId) {
-        super(String.format("Widget with ID %d is not a Goal Widget", widgetId));
+        super(String.format("Widget with ID %d does not have a Goal!", widgetId));
     }
 }

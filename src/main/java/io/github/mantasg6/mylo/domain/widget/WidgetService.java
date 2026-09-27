@@ -2,20 +2,20 @@ package io.github.mantasg6.mylo.domain.widget;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import io.github.mantasg6.mylo.domain.workspace.Workspace;
 import io.github.mantasg6.mylo.domain.workspace.WorkspaceNotFoundException;
 import io.github.mantasg6.mylo.domain.workspace.WorkspaceRepository;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Widget management service.
  *
  */
 @Service
+@RequiredArgsConstructor
 public class WidgetService {
 
     private final WorkspaceRepository workspaceRepository;
@@ -24,20 +24,8 @@ public class WidgetService {
 
     private final WidgetRequestMapper widgetRequestMapper;
 
-    private final Map<WidgetType, WidgetContentHandler<?>> handlers;
+    private final WidgetContentHandlerRegistry handlerRegistry;
 
-    public WidgetService(
-        WorkspaceRepository workspaceRepository,
-        WidgetRepository widgetRepository,
-        WidgetRequestMapper widgetRequestMapper,
-        List<WidgetContentHandler<?>> handlerList
-    ) {
-        this.workspaceRepository = workspaceRepository;
-        this.widgetRepository = widgetRepository;
-        this.widgetRequestMapper = widgetRequestMapper;
-        this.handlers = handlerList.stream()
-                .collect(Collectors.toMap(WidgetContentHandler::getType, h -> h));
-    }
 
     /**
      * Retrieve all Widgets.
@@ -47,7 +35,7 @@ public class WidgetService {
     public List<WidgetResponse<?>> getAllWidgets() {
         List<WidgetResponse<?>> result = new ArrayList<>();
         for (WidgetType type : WidgetType.values()) {
-            WidgetContentHandler<?> handler = handlers.get(type);
+            WidgetContentHandler<?> handler = handlerRegistry.getHandler(type);
             result.addAll(handler.loadAllContent());
         }
         return result;
@@ -62,7 +50,7 @@ public class WidgetService {
     public WidgetResponse<?> getWidgetById(Long id) {
         Widget widget = widgetRepository.findById(id)
                 .orElseThrow(() -> new WidgetNotFoundException(id));
-        WidgetContentHandler<?> handler = handlers.get(widget.getType());
+        WidgetContentHandler<?> handler = handlerRegistry.getHandler(widget.getType());
         return handler.loadContent(widget);
     }
 
@@ -81,7 +69,9 @@ public class WidgetService {
 
         Widget created = widgetRepository.save(widget);
 
-        return handlers.get(request.type()).createContent(created, request.contentId());
+        WidgetContentHandler<?> handler = handlerRegistry.getHandler(request.type());
+
+        return handler.createContent(created, request.contentId());
     }
 
     /**

@@ -20,6 +20,7 @@ import io.github.mantasg6.mylo.domain.goal.GoalMapper;
 import io.github.mantasg6.mylo.domain.goal.GoalRepository;
 import io.github.mantasg6.mylo.domain.goal.GoalResponse;
 import io.github.mantasg6.mylo.domain.widget.Widget;
+import io.github.mantasg6.mylo.domain.widget.WidgetContentHandlerRegistry;
 import io.github.mantasg6.mylo.domain.widget.WidgetContentMapper;
 import io.github.mantasg6.mylo.domain.widget.WidgetRepository;
 import io.github.mantasg6.mylo.domain.widget.WidgetRequest;
@@ -55,6 +56,8 @@ public class GoalWidgetHandlerTest {
 
     private WidgetService widgetService;
 
+    private WidgetContentHandlerRegistry handlerRegistry;
+
     @BeforeEach
     void setUp() {
         widgetContentMapper = Mappers.getMapper(GoalWidgetMapper.class);
@@ -64,11 +67,12 @@ public class GoalWidgetHandlerTest {
                 goalWidgetRepository, widgetContentMapper,
                 goalRepository, goalMapper
         );
+        handlerRegistry = new WidgetContentHandlerRegistry(List.of(goalHandler));
         widgetService = new WidgetService(
             workspaceRepository,
             widgetRepository,
             widgetRequestMapper,
-            List.of(goalHandler)
+            handlerRegistry
         );
     }
 
@@ -172,7 +176,6 @@ public class GoalWidgetHandlerTest {
 
     @Test
     void getWidgetById_shouldThrowWidgetGoalNotFoundException_whenWidgetHasNoGoal() {
-        // Set up the workspace and everything that is included in it (widget, goal, goalWidget)
         Workspace workspace = new Workspace();
         workspace.setId(1L);
 
@@ -189,7 +192,7 @@ public class GoalWidgetHandlerTest {
             () -> widgetService.getWidgetById(1L)
         );
 
-        assertThat(actual.getMessage()).isEqualTo("Widget with ID 1 is not a Goal Widget");
+        assertThat(actual.getMessage()).isEqualTo("Widget with ID 1 does not have a Goal!");
     }
 
 }
