@@ -1,5 +1,8 @@
 package io.github.mantasg6.mylo.domain.goal.widget;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import io.github.mantasg6.mylo.core.database.BaseEntity;
 import io.github.mantasg6.mylo.domain.goal.Goal;
 import io.github.mantasg6.mylo.domain.widget.Widget;
@@ -27,8 +30,10 @@ public class GoalWidget extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "widget_id", nullable = false, unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Widget widget;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Goal goal;
 }

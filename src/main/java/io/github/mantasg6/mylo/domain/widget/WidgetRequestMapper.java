@@ -21,5 +21,5 @@ public interface WidgetRequestMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "workspace", ignore = true)
-    Widget toEntity(WidgetRequest request);
+    Widget toEntity(WidgetCreateRequest request);
 }

@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,8 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import io.github.mantasg6.mylo.domain.widget.WidgetRequest.OnCreate;
-import io.github.mantasg6.mylo.domain.widget.WidgetRequest.OnUpdate;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -61,7 +59,7 @@ public class WidgetController {
      */
     @PostMapping
     public ResponseEntity<WidgetResponse<?>> createWidget(
-        @RequestBody @Validated(OnCreate.class) WidgetRequest request
+        @RequestBody @Valid WidgetCreateRequest request
     ) {
         WidgetResponse<?> created = widgetService.createWidget(request);
         
@@ -82,9 +80,9 @@ public class WidgetController {
      * @return HTTP 200 and the details of the updated Widget.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<WidgetResponse> updateWidget(
+    public ResponseEntity<WidgetResponse<?>> updateWidget(
         @PathVariable Long id,
-        @RequestBody @Validated(OnUpdate.class) WidgetRequest request
+        @RequestBody @Valid WidgetUpdateRequest request
     ) {
         return ResponseEntity.ok(widgetService.updateWidget(id, request));
     }

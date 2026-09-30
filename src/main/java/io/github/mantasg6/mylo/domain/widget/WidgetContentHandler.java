@@ -2,6 +2,9 @@ package io.github.mantasg6.mylo.domain.widget;
 
 import java.util.List;
 
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 /**
  * Handles content management for different types of widgets.
  *
@@ -32,6 +35,7 @@ public interface WidgetContentHandler<T> {
      * @param baseRequest Common Widget features.
      * @param request Features specific to the Widget.
      */
+    @Transactional(propagation = Propagation.MANDATORY)
     WidgetResponse<T> createContent(Widget widget, Long contentId);
 
     /**

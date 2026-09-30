@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import io.github.mantasg6.mylo.domain.workspace.Workspace;
 import io.github.mantasg6.mylo.domain.workspace.WorkspaceNotFoundException;
@@ -33,6 +34,7 @@ public class WidgetService {
      * @return List of Widgets.
      */
     public List<WidgetResponse<?>> getAllWidgets() {
+        // TODO: return widgets with empty content too.
         List<WidgetResponse<?>> result = new ArrayList<>();
         for (WidgetType type : WidgetType.values()) {
             WidgetContentHandler<?> handler = handlerRegistry.getHandler(type);
@@ -51,6 +53,7 @@ public class WidgetService {
         Widget widget = widgetRepository.findById(id)
                 .orElseThrow(() -> new WidgetNotFoundException(id));
         WidgetContentHandler<?> handler = handlerRegistry.getHandler(widget.getType());
+        // TODO: Load content of empty widgets.
         return handler.loadContent(widget);
     }
 
@@ -60,10 +63,15 @@ public class WidgetService {
      * @param request Request with details of the new Widget.
      * @return Response with details about the new Widget.
      */
-    public WidgetResponse<?> createWidget(WidgetRequest request) {
+    @Transactional
+    public WidgetResponse<?> createWidget(WidgetCreateRequest request) {
         Workspace workspace = workspaceRepository.findById(request.workspaceId())
                 .orElseThrow(() -> new WorkspaceNotFoundException(request.workspaceId()));
         Widget widget = widgetRequestMapper.toEntity(request);
+
+        if (positionTaken(workspace, request.position())) {
+            throw new WidgetPositionException(workspace.getId(), request.position());
+        }
 
         workspace.addWidget(widget);
 
@@ -81,9 +89,25 @@ public class WidgetService {
      * @param request Request with Widget details to update.
      * @return Details of the updated Widget.
      */
-    public WidgetResponse updateWidget(Long id, WidgetRequest request) {
-        // TODO: Implement
-        return null;
+    public WidgetResponse<?> updateWidget(Long id, WidgetUpdateRequest request) {
+        // Retrieve required entities
+        Widget widget = widgetRepository.findById(id)
+                .orElseThrow(() -> new WidgetNotFoundException(id));
+        Long workspaceId = widget.getWorkspace().getId();
+        Workspace widgetWorkspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new WorkspaceNotFoundException(workspaceId));
+
+        // Terminate if position already taken
+        if (positionTaken(widgetWorkspace, request.position())) {
+            throw new WidgetPositionException(widgetWorkspace.getId(), request.position());
+        }
+
+        // Update position
+        widget.setPosition(request.position());
+        Widget updated = widgetRepository.save(widget);
+
+        // Return full details of the updated widget
+        return handlerRegistry.getHandler(updated.getType()).loadContent(updated);
     }
 
     /**
@@ -92,6 +116,18 @@ public class WidgetService {
      * @param id ID of the Widget to delete.
      */
     public void deleteWidget(Long id) {
-        // TODO: Implement
+        widgetRepository.deleteById(id);
+    }
+
+    /**
+     * Checks if Widget position is already taken in the Workspace.
+     *
+     * @param workspace Workspace to check.
+     * @param position Position to check.
+     * @return true if position is taken, false otherwise.
+     */
+    private boolean positionTaken(Workspace workspace, int position) {
+        return workspace.getWidgets().stream()
+                .anyMatch(w -> w.getPosition() == position);
     }
 }

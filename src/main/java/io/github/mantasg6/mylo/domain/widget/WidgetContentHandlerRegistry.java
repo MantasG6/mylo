@@ -18,7 +18,7 @@ public class WidgetContentHandlerRegistry {
 
     public WidgetContentHandlerRegistry(List<WidgetContentHandler<?>> handlerList) {
         this.handlers = handlerList.stream()
-                .collect(Collectors.toMap(WidgetContentHandler::getType, Function.identity()));
+                .collect(Collectors.toUnmodifiableMap(WidgetContentHandler::getType, Function.identity()));
     }
 
     /**
