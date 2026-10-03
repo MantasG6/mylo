@@ -1,8 +1,8 @@
 package io.github.mantasg6.mylo.domain.goal.widget;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -133,7 +133,8 @@ public class GoalWidgetHandlerTest {
         GoalWidget goalWidget = new GoalWidget(widget, goal);
         goalWidget.setId(1L);
 
-        when(goalWidgetRepository.findAll()).thenReturn(List.of(goalWidget));
+        when(widgetRepository.findAll()).thenReturn(List.of(widget));
+        when(goalWidgetRepository.findByWidgetIn(anyList())).thenReturn(List.of(goalWidget));
 
         // Execute the test
         List<WidgetResponse<?>> actual = widgetService.getAllWidgets();
@@ -176,7 +177,7 @@ public class GoalWidgetHandlerTest {
     }
 
     @Test
-    void getWidgetById_shouldThrowWidgetGoalNotFoundException_whenWidgetHasNoGoal() {
+    void getWidgetById_shouldReturnWidgetWithContentNull_whenWidgetHasNoGoal() {
         Workspace workspace = new Workspace();
         workspace.setId(1L);
 
@@ -188,12 +189,12 @@ public class GoalWidgetHandlerTest {
         when(widgetRepository.findById(1L)).thenReturn(Optional.of(widget));
         when(goalWidgetRepository.findByWidget(widget)).thenReturn(Optional.empty());
 
-        GoalWidgetNotFoundException actual = assertThrows(
-            GoalWidgetNotFoundException.class,
-            () -> widgetService.getWidgetById(1L)
-        );
+        WidgetResponse<?> actual = widgetService.getWidgetById(1L);
 
-        assertThat(actual.getMessage()).isEqualTo("Widget with ID 1 does not have a Goal!");
+        assertThat(actual.content()).isEqualTo(null);
+        assertThat(actual.type()).isEqualTo(WidgetType.GOAL);
+        assertThat(actual.id()).isEqualTo(1L);
+        assertThat(actual.workspaceId()).isEqualTo(1L);
     }
 
 }
