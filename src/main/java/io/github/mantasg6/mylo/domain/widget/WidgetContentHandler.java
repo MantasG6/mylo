@@ -16,13 +16,6 @@ public interface WidgetContentHandler<T> {
     WidgetType getType();
 
     /**
-     * Builds and returns the Widget content.
-     *
-     * @param widget Base widget features.
-     */
-    List<WidgetResponse<T>> loadAllContent();
-
-    /**
      * Builds and returns details of a single Widget.
      *
      * @param widget The Widget to build and return details for.

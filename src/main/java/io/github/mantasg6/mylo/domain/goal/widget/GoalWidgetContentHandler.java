@@ -1,6 +1,5 @@
 package io.github.mantasg6.mylo.domain.goal.widget;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -32,22 +31,6 @@ public class GoalWidgetContentHandler implements WidgetContentHandler<GoalRespon
 	@Override
 	public WidgetType getType() {
         return WidgetType.GOAL;
-	}
-
-	@Override
-	public List<WidgetResponse<GoalResponse>> loadAllContent() {
-        List<WidgetResponse<GoalResponse>> result = new ArrayList<>();
-
-        List<GoalWidget> allGoalWidgets = goalWidgetRepository.findAll();
-
-        for (GoalWidget goalWidget : allGoalWidgets) {
-            WidgetResponse<GoalResponse> widgetWithContent = widgetContentMapper.toDto(
-                goalWidget.getWidget(),
-                goalMapper.toDto(goalWidget.getGoal())
-            );
-            result.add(widgetWithContent);
-        }
-		return result;
 	}
 
 	@Override
