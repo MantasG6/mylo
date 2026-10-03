@@ -2,6 +2,9 @@ package io.github.mantasg6.mylo.domain.goal.widget;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
@@ -49,9 +52,11 @@ public class GoalWidgetContentHandler implements WidgetContentHandler<GoalRespon
 
 	@Override
 	public WidgetResponse<GoalResponse> loadContent(Widget widget) {
-        GoalWidget goalWidget = goalWidgetRepository.findByWidget(widget)
-                .orElseThrow(() -> new GoalWidgetNotFoundException(widget.getId()));
-        return widgetContentMapper.toDto(widget, goalMapper.toDto(goalWidget.getGoal()));
+        return goalWidgetRepository.findByWidget(widget)
+                .map(GoalWidget::getGoal)
+                .map(goalMapper::toDto)
+                .map(goalResponse -> widgetContentMapper.toDto(widget, goalResponse))
+                .orElseGet(() -> widgetContentMapper.toDto(widget, null));
 	}
 
 	@Override
@@ -64,11 +69,14 @@ public class GoalWidgetContentHandler implements WidgetContentHandler<GoalRespon
 	@Override
 	public List<WidgetResponse<GoalResponse>> mapContentList(List<Widget> widgets) {
         List<GoalWidget> goalWidgets = goalWidgetRepository.findByWidgetIn(widgets);
-        return goalWidgets.stream()
-                .map(goalWidget -> {
-                    return widgetContentMapper.toDto(
-                            goalWidget.getWidget(),
-                            goalMapper.toDto(goalWidget.getGoal()));
+        Map<Long, GoalWidget> goalWidgetsMap = goalWidgets.stream()
+                .collect(Collectors.toMap(GoalWidget::getId, Function.identity()));
+
+        return widgets.stream()
+                .map(w -> {
+                    GoalWidget goalWidget = goalWidgetsMap.get(w.getId());
+                    GoalResponse goalResponse = goalWidget == null ? null : goalMapper.toDto(goalWidget.getGoal());
+                    return widgetContentMapper.toDto(w, goalResponse);
                 })
                 .toList();
 	}

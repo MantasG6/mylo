@@ -13,6 +13,7 @@ public record WidgetResponse<T>(
     Long id,
     Long workspaceId,
     Integer position,
+    WidgetType type,
     Instant createdAt,
     Instant updatedAt,
     T content

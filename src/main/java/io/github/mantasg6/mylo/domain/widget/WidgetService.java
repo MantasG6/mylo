@@ -34,12 +34,18 @@ public class WidgetService {
      * @return List of Widgets.
      */
     public List<WidgetResponse<?>> getAllWidgets() {
-        // TODO: return widgets with empty content too.
+        List<Widget> allWidgets = widgetRepository.findAll();
         List<WidgetResponse<?>> result = new ArrayList<>();
+
         for (WidgetType type : WidgetType.values()) {
             WidgetContentHandler<?> handler = handlerRegistry.getHandler(type);
-            result.addAll(handler.loadAllContent());
+            List<Widget> typeWidgets = allWidgets.stream()
+                    .filter(w -> w.getType().equals(type))
+                    .toList();
+
+            result.addAll(handler.mapContentList(typeWidgets));
         }
+
         return result;
     }
 
@@ -53,7 +59,6 @@ public class WidgetService {
         Widget widget = widgetRepository.findById(id)
                 .orElseThrow(() -> new WidgetNotFoundException(id));
         WidgetContentHandler<?> handler = handlerRegistry.getHandler(widget.getType());
-        // TODO: Load content of empty widgets.
         return handler.loadContent(widget);
     }
 
