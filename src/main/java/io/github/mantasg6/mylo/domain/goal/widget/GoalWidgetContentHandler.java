@@ -50,6 +50,23 @@ public class GoalWidgetContentHandler implements WidgetContentHandler<GoalRespon
 	}
 
 	@Override
+	public WidgetResponse<GoalResponse> updateContent(Widget widget, Long goalId) {
+        Goal goal = goalRepository.findById(goalId).orElseThrow(() -> new GoalNotFoundException(goalId));
+
+        GoalWidget goalWidget = goalWidgetRepository.findByWidget(widget)
+                .map(existing -> {
+                    if (existing.getGoal().getId().equals(goalId)) {
+                        return existing; // it's the same goal, nothing to change
+                    }
+                    existing.setGoal(goal);
+                    return goalWidgetRepository.save(existing);
+                })
+                .orElseGet(() -> goalWidgetRepository.save(new GoalWidget(widget, goal)));
+
+        return widgetContentMapper.toDto(widget, goalMapper.toDto(goalWidget.getGoal()));
+	}
+
+	@Override
 	public List<WidgetResponse<GoalResponse>> mapContentList(List<Widget> widgets) {
         List<GoalWidget> goalWidgets = goalWidgetRepository.findByWidgetIn(widgets);
         Map<Long, GoalWidget> goalWidgetsMap = goalWidgets.stream()

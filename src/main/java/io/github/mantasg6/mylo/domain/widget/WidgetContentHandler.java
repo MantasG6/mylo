@@ -25,11 +25,21 @@ public interface WidgetContentHandler<T> {
     /**
      * Creates a Widget with details specified in the request.
      *
-     * @param baseRequest Common Widget features.
-     * @param request Features specific to the Widget.
+     * @param widget Base Widget entity.
+     * @param contentId Id for the Widget content reference.
      */
     @Transactional(propagation = Propagation.MANDATORY)
     WidgetResponse<T> createContent(Widget widget, Long contentId);
+
+    /**
+     * Updates a Widget with details specified in the request.
+     * Returns Widget Response with unchanged content mapped if provided contentId is the same.
+     *
+     * @param widget Base Widget entity.
+     * @param contentId Id for the new Widget content reference.
+     */
+    @Transactional(propagation = Propagation.MANDATORY)
+    WidgetResponse<T> updateContent(Widget widget, Long contentId);
 
     /**
      * Maps Widget entity list to Widget Response list.

@@ -49,4 +49,15 @@ public class Workspace extends BaseEntity {
         widgets.add(widget);
         widget.setWorkspace(this);
     }
+
+    /**
+     * Helper method to transfer a Widget to another Workspace.
+     *
+     * @param widget Widget to transfer.
+     * @param newWorkspace Target workspace.
+     */
+    public void transferWidget(Widget widget, Workspace newWorkspace) {
+        widgets.remove(widget);
+        newWorkspace.addWidget(widget);
+    }
 }

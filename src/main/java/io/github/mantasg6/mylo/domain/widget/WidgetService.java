@@ -69,7 +69,7 @@ public class WidgetService {
      * @return Response with details about the new Widget.
      */
     @Transactional
-    public WidgetResponse<?> createWidget(WidgetCreateRequest request) {
+    public WidgetResponse<?> createWidget(WidgetRequest request) {
         Workspace workspace = workspaceRepository.findById(request.workspaceId())
                 .orElseThrow(() -> new WorkspaceNotFoundException(request.workspaceId()));
         Widget widget = widgetRequestMapper.toEntity(request);
@@ -94,24 +94,45 @@ public class WidgetService {
      * @param request Request with Widget details to update.
      * @return Details of the updated Widget.
      */
-    public WidgetResponse<?> updateWidget(Long id, WidgetUpdateRequest request) {
-        // Retrieve required entities
+    public WidgetResponse<?> updateWidget(Long id, WidgetRequest request) {
+        // Retrieve required entities.
         Widget widget = widgetRepository.findById(id)
                 .orElseThrow(() -> new WidgetNotFoundException(id));
         Long workspaceId = widget.getWorkspace().getId();
         Workspace widgetWorkspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new WorkspaceNotFoundException(workspaceId));
 
-        // Terminate if position already taken
-        if (positionTaken(widgetWorkspace, request.position())) {
-            throw new WidgetPositionException(widgetWorkspace.getId(), request.position());
+        // Update type. TODO: Implement type update when more than 1 type is implemented.
+        if (request.type() != null) {
+            throw new UnsupportedOperationException("Type update is not implemented yet");
         }
 
-        // Update position
-        widget.setPosition(request.position());
+        // Update Workspace.
+        if (request.workspaceId() != null) {
+            Workspace newWorkspace = workspaceRepository.findById(request.workspaceId())
+                    .orElseThrow(() -> new WorkspaceNotFoundException(request.workspaceId()));
+            widgetWorkspace.transferWidget(widget, newWorkspace);
+            widgetWorkspace = newWorkspace;
+        }
+
+        // Update position.
+        if (request.position() != null) {
+            // Terminate if position already taken.
+            if (positionTaken(widgetWorkspace, request.position())) {
+                throw new WidgetPositionException(widgetWorkspace.getId(), request.position());
+            }
+            widget.setPosition(request.position());
+        }
+
+        // Persist updated Widget.
         Widget updated = widgetRepository.save(widget);
 
-        // Return full details of the updated widget
+        // Update Widget content and return full details of the updated Widget.
+        if (request.contentId() != null) {
+            return handlerRegistry.getHandler(updated.getType()).updateContent(updated, request.contentId());
+        }
+        
+        // No content updates, return new Widget with unchanged content.
         return handlerRegistry.getHandler(updated.getType()).loadContent(updated);
     }
 
@@ -125,7 +146,7 @@ public class WidgetService {
     }
 
     /**
-     * Checks if Widget position is already taken in the Workspace.
+     * Helper to check if Widget position is already taken in the Workspace.
      *
      * @param workspace Workspace to check.
      * @param position Position to check.

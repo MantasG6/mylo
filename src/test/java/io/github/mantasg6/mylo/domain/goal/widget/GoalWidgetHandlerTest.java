@@ -22,8 +22,8 @@ import io.github.mantasg6.mylo.domain.goal.GoalResponse;
 import io.github.mantasg6.mylo.domain.widget.Widget;
 import io.github.mantasg6.mylo.domain.widget.WidgetContentHandlerRegistry;
 import io.github.mantasg6.mylo.domain.widget.WidgetContentMapper;
-import io.github.mantasg6.mylo.domain.widget.WidgetCreateRequest;
 import io.github.mantasg6.mylo.domain.widget.WidgetRepository;
+import io.github.mantasg6.mylo.domain.widget.WidgetRequest;
 import io.github.mantasg6.mylo.domain.widget.WidgetRequestMapper;
 import io.github.mantasg6.mylo.domain.widget.WidgetResponse;
 import io.github.mantasg6.mylo.domain.widget.WidgetService;
@@ -79,7 +79,7 @@ public class GoalWidgetHandlerTest {
     @Test
     void createWidget_returnsCreatedWidgetWithGoal_whenGoalTypeInRequest() {
         // Set up the request and empty workspace
-        WidgetCreateRequest request = WidgetCreateRequest.builder()
+        WidgetRequest request = WidgetRequest.builder()
                 .workspaceId(1L)
                 .type(WidgetType.GOAL)
                 .position(1)
