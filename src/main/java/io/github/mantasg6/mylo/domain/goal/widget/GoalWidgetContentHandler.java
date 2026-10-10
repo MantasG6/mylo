@@ -70,7 +70,7 @@ public class GoalWidgetContentHandler implements WidgetContentHandler<GoalRespon
 	public List<WidgetResponse<GoalResponse>> mapContentList(List<Widget> widgets) {
         List<GoalWidget> goalWidgets = goalWidgetRepository.findByWidgetIn(widgets);
         Map<Long, GoalWidget> goalWidgetsMap = goalWidgets.stream()
-                .collect(Collectors.toMap(GoalWidget::getId, Function.identity()));
+                .collect(Collectors.toMap(gw -> gw.getWidget().getId(), Function.identity()));
 
         return widgets.stream()
                 .map(w -> {
