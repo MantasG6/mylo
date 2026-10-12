@@ -3,6 +3,7 @@ package io.github.mantasg6.mylo.domain.goal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.net.URI;
 
 import org.junit.jupiter.api.Test;
@@ -30,12 +31,15 @@ public class GoalControllerTest {
     void POST_shouldReturnCreated_whenValidRequest() {
         Long id = 1L;
         String name = "Goal #1";
+        BigDecimal annualTarget = new BigDecimal("10.365");
         GoalRequest request = GoalRequest.builder()
                 .name(name)
+                .annualTarget(annualTarget)
                 .build();
         GoalResponse expected = GoalResponse.builder()
                 .id(id)
                 .name(name)
+                .annualTarget(annualTarget)
                 .build();
         when(goalService.createGoal(request)).thenReturn(expected);
 
@@ -51,6 +55,7 @@ public class GoalControllerTest {
         assertThat(location.getPath()).isEqualTo("/api/goals/1");
         assertThat(actual.id()).isEqualTo(id);
         assertThat(actual.name()).isEqualTo(name);
+        assertThat(actual.annualTarget()).isEqualTo(annualTarget);
     }
 
     @Test
