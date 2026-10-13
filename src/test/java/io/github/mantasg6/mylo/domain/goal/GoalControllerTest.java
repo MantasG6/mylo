@@ -78,4 +78,140 @@ public class GoalControllerTest {
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
         assertThat(actual.getErrors()).containsEntry("name", "Goal name must be 1-25 characters");
     }
+
+    @Test
+    void POST_shouldReturnBadRequest_whenNameEmpty() {
+        GoalRequest invalidRequest = GoalRequest.builder()
+                .name("")
+                .build();
+
+        ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
+        .body(invalidRequest)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectBody(ValidationProblemDetail.class)
+        .returnResult()
+        .getResponseBody();
+
+        assertThat(actual.getDetail()).isEqualTo("Validation failed");
+        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        assertThat(actual.getErrors()).containsEntry("name", "Goal name must be 1-25 characters");
+    }
+
+    @Test
+    void POST_shouldReturnBadRequest_whenNameNull() {
+        GoalRequest invalidRequest = GoalRequest.builder().build();
+
+        ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
+        .body(invalidRequest)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectBody(ValidationProblemDetail.class)
+        .returnResult()
+        .getResponseBody();
+
+        assertThat(actual.getDetail()).isEqualTo("Validation failed");
+        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        assertThat(actual.getErrors()).containsEntry("name", "Goal must have a name");
+    }
+
+    @Test
+    void POST_shouldReturnBadRequest_whenAnnualTargetNull() {
+        GoalRequest invalidRequest = GoalRequest.builder().build();
+
+        ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
+        .body(invalidRequest)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectBody(ValidationProblemDetail.class)
+        .returnResult()
+        .getResponseBody();
+
+        assertThat(actual.getDetail()).isEqualTo("Validation failed");
+        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        assertThat(actual.getErrors()).containsEntry("annualTarget", "Goal must have a numerical annual target");
+    }
+
+    @Test
+    void POST_shouldReturnBadRequest_whenAnnualTargetTooBig() {
+        GoalRequest invalidRequest = GoalRequest.builder()
+                .annualTarget(new BigDecimal("1000000000"))
+                .build();
+
+        ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
+        .body(invalidRequest)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectBody(ValidationProblemDetail.class)
+        .returnResult()
+        .getResponseBody();
+
+        assertThat(actual.getDetail()).isEqualTo("Validation failed");
+        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        assertThat(actual.getErrors()).containsEntry("annualTarget",
+                "Annual target must be up to 1 billion with 3 decimal places at most");
+    }
+
+
+    @Test
+    void POST_shouldReturnBadRequest_whenAnnualTargetMoreThan3DecimalPlaces() {
+        GoalRequest invalidRequest = GoalRequest.builder()
+                .annualTarget(new BigDecimal("1.3183"))
+                .build();
+
+        ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
+        .body(invalidRequest)
+        .exchange()
+        .expectStatus().isBadRequest()
+        .expectBody(ValidationProblemDetail.class)
+        .returnResult()
+        .getResponseBody();
+
+        assertThat(actual.getDetail()).isEqualTo("Validation failed");
+        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        assertThat(actual.getErrors()).containsEntry("annualTarget",
+                "Annual target must be up to 1 billion with 3 decimal places at most");
+    }
+
+
+    @Test
+    void POST_shouldReturnCreated_whenAnnualTargetLessThan1Billion() {
+        Long id = 1L;
+        String name = "Goal #1";
+        BigDecimal annualTarget = new BigDecimal("999999999.99");
+        GoalRequest request = GoalRequest.builder()
+                .name(name)
+                .annualTarget(annualTarget)
+                .build();
+        GoalResponse expected = GoalResponse.builder()
+                .id(id)
+                .name(name)
+                .annualTarget(annualTarget)
+                .build();
+        when(goalService.createGoal(request)).thenReturn(expected);
+
+        EntityExchangeResult<GoalResponse> result = restTestClient.post().uri("/api/goals")
+                .body(request)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(GoalResponse.class)
+                .returnResult();
+        URI location = result.getResponseHeaders().getLocation();
+        GoalResponse actual = result.getResponseBody();
+
+        assertThat(location.getPath()).isEqualTo("/api/goals/1");
+        assertThat(actual.id()).isEqualTo(id);
+        assertThat(actual.name()).isEqualTo(name);
+        assertThat(actual.annualTarget()).isEqualTo(annualTarget);
+    }
 }

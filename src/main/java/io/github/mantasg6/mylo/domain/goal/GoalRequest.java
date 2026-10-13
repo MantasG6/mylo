@@ -18,6 +18,10 @@ public record GoalRequest(
         message = "Goal name must be 1-25 characters",
         groups = { OnCreate.class, OnUpdate.class }
     )
+    @NotNull(
+        message = "Goal must have a name",
+        groups = OnCreate.class
+    )
     String name,
 
     @NotNull(
@@ -27,7 +31,7 @@ public record GoalRequest(
     @Digits(
         integer = 9,
         fraction = 3,
-        message = "Choose a target up to 1 billion with 3 decimal places at most",
+        message = "Annual target must be up to 1 billion with 3 decimal places at most",
         groups = { OnCreate.class, OnUpdate.class }
     )
     BigDecimal annualTarget
