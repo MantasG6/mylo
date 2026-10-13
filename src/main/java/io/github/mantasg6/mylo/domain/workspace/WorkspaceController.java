@@ -4,7 +4,6 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,8 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import io.github.mantasg6.mylo.domain.workspace.WorkspaceRequest.OnCreate;
-import io.github.mantasg6.mylo.domain.workspace.WorkspaceRequest.OnUpdate;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 
@@ -63,7 +61,7 @@ public class WorkspaceController {
      */
     @PostMapping()
     public ResponseEntity<WorkspaceResponse> createWorkspace(
-        @RequestBody @Validated(OnCreate.class) WorkspaceRequest request) {
+        @RequestBody @Valid WorkspaceRequest request) {
         WorkspaceResponse created = workspaceService.createWorkspace(request);
 
         URI location = ServletUriComponentsBuilder
@@ -85,7 +83,7 @@ public class WorkspaceController {
     @PutMapping("/{id}")
     public ResponseEntity<WorkspaceResponse> updateWorkspace(
             @PathVariable Long id,
-            @RequestBody @Validated(OnUpdate.class) WorkspaceRequest request) {
+            @RequestBody @Valid WorkspaceRequest request) {
         return ResponseEntity.ok(workspaceService.updateWorkspace(id, request));
     }
 

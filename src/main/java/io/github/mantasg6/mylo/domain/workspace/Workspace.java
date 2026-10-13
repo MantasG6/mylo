@@ -1,13 +1,11 @@
 package io.github.mantasg6.mylo.domain.workspace;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.github.mantasg6.mylo.core.database.BaseEntity;
 import io.github.mantasg6.mylo.domain.widget.Widget;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -32,12 +30,6 @@ public class Workspace extends BaseEntity {
         orphanRemoval = true
     )
     private List<Widget> widgets = new ArrayList<>();
-
-    @Column(name = "period_start")
-    private LocalDate periodStart;
-
-    @Column(name = "period_end")
-    private LocalDate periodEnd;
 
     /**
      * Helper method to add a Widget to the Workspace.
