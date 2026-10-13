@@ -185,10 +185,41 @@ public class GoalControllerTest {
 
 
     @Test
-    void POST_shouldReturnCreated_whenAnnualTargetLessThan1Billion() {
+    void POST_shouldReturnCreated_whenAnnualTarget999999999() {
         Long id = 1L;
         String name = "Goal #1";
         BigDecimal annualTarget = new BigDecimal("999999999.99");
+        GoalRequest request = GoalRequest.builder()
+                .name(name)
+                .annualTarget(annualTarget)
+                .build();
+        GoalResponse expected = GoalResponse.builder()
+                .id(id)
+                .name(name)
+                .annualTarget(annualTarget)
+                .build();
+        when(goalService.createGoal(request)).thenReturn(expected);
+
+        EntityExchangeResult<GoalResponse> result = restTestClient.post().uri("/api/goals")
+                .body(request)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(GoalResponse.class)
+                .returnResult();
+        URI location = result.getResponseHeaders().getLocation();
+        GoalResponse actual = result.getResponseBody();
+
+        assertThat(location.getPath()).isEqualTo("/api/goals/1");
+        assertThat(actual.id()).isEqualTo(id);
+        assertThat(actual.name()).isEqualTo(name);
+        assertThat(actual.annualTarget()).isEqualTo(annualTarget);
+    }
+
+    @Test
+    void POST_shouldReturnCreated_whenAnnualTargetNegative() {
+        Long id = 1L;
+        String name = "Goal #1";
+        BigDecimal annualTarget = new BigDecimal("-999999999.99");
         GoalRequest request = GoalRequest.builder()
                 .name(name)
                 .annualTarget(annualTarget)
