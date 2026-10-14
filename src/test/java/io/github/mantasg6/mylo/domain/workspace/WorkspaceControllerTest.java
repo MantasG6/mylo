@@ -185,10 +185,10 @@ public class WorkspaceControllerTest {
     }
 
     @Test
-    void PUT_shouldReturnBadRequest_whenNameNull() {
+    void PATCH_shouldReturnBadRequest_whenNameNull() {
         WorkspaceRequest invalidRequest = WorkspaceRequest.builder().build();
 
-        ValidationProblemDetail actual = restTestClient.put().uri("/api/workspaces/1")
+        ValidationProblemDetail actual = restTestClient.patch().uri("/api/workspaces/1")
                 .body(invalidRequest)
                 .exchange()
                 .expectStatus().isBadRequest()
@@ -204,7 +204,7 @@ public class WorkspaceControllerTest {
     }
 
     @Test
-    void PUT_shouldReturnOk_whenValidIdAndRequest() {
+    void PATCH_shouldReturnOk_whenValidIdAndRequest() {
         Instant createdAt = LocalDateTime.of(2020, 1, 20, 14, 30).toInstant(ZoneOffset.UTC);
         long id = 1L;
         WorkspaceResponse current = WorkspaceResponse.builder()
@@ -225,7 +225,7 @@ public class WorkspaceControllerTest {
         when(workspaceService.getWorkspaceById(id)).thenReturn(current);
         when(workspaceService.updateWorkspace(id, updateRequest)).thenReturn(updated);
 
-        WorkspaceResponse actual = restTestClient.put().uri("/api/workspaces/{id}", id)
+        WorkspaceResponse actual = restTestClient.patch().uri("/api/workspaces/{id}", id)
                 .body(updateRequest)
                 .exchange()
                 .expectStatus().isOk()
