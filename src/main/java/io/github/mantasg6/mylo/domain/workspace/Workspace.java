@@ -6,6 +6,7 @@ import java.util.List;
 import io.github.mantasg6.mylo.core.database.BaseEntity;
 import io.github.mantasg6.mylo.domain.widget.Widget;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -22,6 +23,7 @@ import lombok.Setter;
 @Table(name = "workspaces")
 public class Workspace extends BaseEntity {
 
+    @Column(nullable = false)
     private String name;
 
     @OneToMany(

@@ -31,15 +31,15 @@ public class GoalControllerTest {
     void POST_shouldReturnCreated_whenValidRequest() {
         Long id = 1L;
         String name = "Goal #1";
-        BigDecimal annualTarget = new BigDecimal("10.365");
+        BigDecimal target = new BigDecimal("10.365");
         GoalRequest request = GoalRequest.builder()
                 .name(name)
-                .annualTarget(annualTarget)
+                .target(target)
                 .build();
         GoalResponse expected = GoalResponse.builder()
                 .id(id)
                 .name(name)
-                .annualTarget(annualTarget)
+                .target(target)
                 .build();
         when(goalService.createGoal(request)).thenReturn(expected);
 
@@ -55,7 +55,7 @@ public class GoalControllerTest {
         assertThat(location.getPath()).isEqualTo("/api/goals/1");
         assertThat(actual.id()).isEqualTo(id);
         assertThat(actual.name()).isEqualTo(name);
-        assertThat(actual.annualTarget()).isEqualTo(annualTarget);
+        assertThat(actual.target()).isEqualTo(target);
     }
 
     @Test
@@ -120,7 +120,7 @@ public class GoalControllerTest {
     }
 
     @Test
-    void POST_shouldReturnBadRequest_whenAnnualTargetNull() {
+    void POST_shouldReturnBadRequest_whenTargetNull() {
         GoalRequest invalidRequest = GoalRequest.builder().build();
 
         ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
@@ -135,13 +135,13 @@ public class GoalControllerTest {
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("annualTarget", "Goal must have a numerical annual target");
+        assertThat(actual.getErrors()).containsEntry("target", "Goal must have a numerical target");
     }
 
     @Test
-    void POST_shouldReturnBadRequest_whenAnnualTargetTooBig() {
+    void POST_shouldReturnBadRequest_whenTargetTooBig() {
         GoalRequest invalidRequest = GoalRequest.builder()
-                .annualTarget(new BigDecimal("1000000000"))
+                .target(new BigDecimal("1000000000"))
                 .build();
 
         ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
@@ -156,15 +156,15 @@ public class GoalControllerTest {
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("annualTarget",
-                "Annual target must be up to 1 billion with 3 decimal places at most");
+        assertThat(actual.getErrors()).containsEntry("target",
+                "Target must be up to 1 billion with 3 decimal places at most");
     }
 
 
     @Test
-    void POST_shouldReturnBadRequest_whenAnnualTargetMoreThan3DecimalPlaces() {
+    void POST_shouldReturnBadRequest_whenTargetMoreThan3DecimalPlaces() {
         GoalRequest invalidRequest = GoalRequest.builder()
-                .annualTarget(new BigDecimal("1.3183"))
+                .target(new BigDecimal("1.3183"))
                 .build();
 
         ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
@@ -179,24 +179,24 @@ public class GoalControllerTest {
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("annualTarget",
-                "Annual target must be up to 1 billion with 3 decimal places at most");
+        assertThat(actual.getErrors()).containsEntry("target",
+                "Target must be up to 1 billion with 3 decimal places at most");
     }
 
 
     @Test
-    void POST_shouldReturnCreated_whenAnnualTarget999999999() {
+    void POST_shouldReturnCreated_whenTargetAlmostTooBig() {
         Long id = 1L;
         String name = "Goal #1";
-        BigDecimal annualTarget = new BigDecimal("999999999.99");
+        BigDecimal target = new BigDecimal("999999999.99");
         GoalRequest request = GoalRequest.builder()
                 .name(name)
-                .annualTarget(annualTarget)
+                .target(target)
                 .build();
         GoalResponse expected = GoalResponse.builder()
                 .id(id)
                 .name(name)
-                .annualTarget(annualTarget)
+                .target(target)
                 .build();
         when(goalService.createGoal(request)).thenReturn(expected);
 
@@ -212,37 +212,6 @@ public class GoalControllerTest {
         assertThat(location.getPath()).isEqualTo("/api/goals/1");
         assertThat(actual.id()).isEqualTo(id);
         assertThat(actual.name()).isEqualTo(name);
-        assertThat(actual.annualTarget()).isEqualTo(annualTarget);
-    }
-
-    @Test
-    void POST_shouldReturnCreated_whenAnnualTargetNegative() {
-        Long id = 1L;
-        String name = "Goal #1";
-        BigDecimal annualTarget = new BigDecimal("-999999999.99");
-        GoalRequest request = GoalRequest.builder()
-                .name(name)
-                .annualTarget(annualTarget)
-                .build();
-        GoalResponse expected = GoalResponse.builder()
-                .id(id)
-                .name(name)
-                .annualTarget(annualTarget)
-                .build();
-        when(goalService.createGoal(request)).thenReturn(expected);
-
-        EntityExchangeResult<GoalResponse> result = restTestClient.post().uri("/api/goals")
-                .body(request)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody(GoalResponse.class)
-                .returnResult();
-        URI location = result.getResponseHeaders().getLocation();
-        GoalResponse actual = result.getResponseBody();
-
-        assertThat(location.getPath()).isEqualTo("/api/goals/1");
-        assertThat(actual.id()).isEqualTo(id);
-        assertThat(actual.name()).isEqualTo(name);
-        assertThat(actual.annualTarget()).isEqualTo(annualTarget);
+        assertThat(actual.target()).isEqualTo(target);
     }
 }
