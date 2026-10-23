@@ -35,6 +35,12 @@ public class GlobalExceptionHandler {
     private static final String VALIDATION_FAILED = "Validation failed";
     private static final String INVALID_JSON = "Invalid JSON request";
 
+    /**
+     * Handle validation errors.
+     *
+     * @param ex Exception containing validation errors.
+     * @return Problem Detail with validation error map.
+     */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ValidationProblemDetail handleUnreadable(HttpMessageNotReadableException ex) {
         ValidationProblemDetail problemDetail = new ValidationProblemDetail(HttpStatus.BAD_REQUEST.value());
@@ -107,13 +113,13 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * Exception handler to handle all the common application failures.
+     * Exception handler to handle all the resource conflict exceptions.
      *
-     * @param ex Custom exception that represents a common application failure.
-     * @return Response containing problem details and 400 result code.
+     * @param ex Custom exception that represents a resource conflict failure.
+     * @return Response containing problem details and 409 result code.
      */
-    @ExceptionHandler(CommonApplicationException.class)
-    public ProblemDetail handleCommonFailures(CommonApplicationException ex) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+    @ExceptionHandler(ResourceConflictException.class)
+    public ProblemDetail handleResourceConflict(ResourceConflictException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
     }
 }

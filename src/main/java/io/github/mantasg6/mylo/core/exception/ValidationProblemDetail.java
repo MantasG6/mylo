@@ -4,6 +4,10 @@ import java.util.Map;
 
 import org.springframework.http.ProblemDetail;
 
+/**
+ * Problem Detail class that also contains validation error map.
+ *
+ */
 public class ValidationProblemDetail extends ProblemDetail {
     private Map<String, String> errors;
 

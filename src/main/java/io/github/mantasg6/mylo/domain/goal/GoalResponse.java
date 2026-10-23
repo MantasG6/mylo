@@ -2,9 +2,7 @@ package io.github.mantasg6.mylo.domain.goal;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
 
-import io.github.mantasg6.mylo.domain.progress.Progress;
 import lombok.Builder;
 
 /**
@@ -15,8 +13,7 @@ import lombok.Builder;
 public record GoalResponse(
     Long id,
     String name,
-    BigDecimal annualTarget,
-    List<Progress> progress,
+    BigDecimal target,
     Instant createdAt,
     Instant updatedAt
 ) {}
