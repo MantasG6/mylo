@@ -141,7 +141,7 @@ public class WorkspaceControllerTest {
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/workspaces"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("name", "Workspace name length must be 1-20 characters");
+        assertThat(actual.getErrors().get("name")).contains("Workspace name length must be 1-20 characters");
     }
 
     @Test
@@ -162,7 +162,7 @@ public class WorkspaceControllerTest {
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/workspaces"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("name", "Workspace name length must be 1-20 characters");
+        assertThat(actual.getErrors().get("name")).contains("Workspace name length must be 1-20 characters");
     }
 
     @Test
@@ -181,7 +181,7 @@ public class WorkspaceControllerTest {
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/workspaces"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("name", "Workspace must have a name");
+        assertThat(actual.getErrors().get("name")).contains("Workspace must have a name");
     }
 
     @Test
@@ -200,7 +200,7 @@ public class WorkspaceControllerTest {
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/workspaces/1"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("name", "Workspace must have a name");
+        assertThat(actual.getErrors().get("name")).contains("Workspace must have a name");
     }
 
     @Test

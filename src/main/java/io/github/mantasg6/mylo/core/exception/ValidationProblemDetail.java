@@ -1,5 +1,6 @@
 package io.github.mantasg6.mylo.core.exception;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ProblemDetail;
@@ -9,7 +10,7 @@ import org.springframework.http.ProblemDetail;
  *
  */
 public class ValidationProblemDetail extends ProblemDetail {
-    private Map<String, String> errors;
+    private Map<String, List<String>> errors;
 
     public ValidationProblemDetail() {
         super();
@@ -19,11 +20,11 @@ public class ValidationProblemDetail extends ProblemDetail {
         super(rawStatusCode);
     }
 
-    public Map<String, String> getErrors() {
+    public Map<String, List<String>> getErrors() {
         return errors;
     }
 
-    public void setErrors(Map<String, String> errors) {
+    public void setErrors(Map<String, List<String>> errors) {
         this.errors = errors;
     }
 }

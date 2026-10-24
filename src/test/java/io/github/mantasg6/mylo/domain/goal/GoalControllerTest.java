@@ -76,7 +76,7 @@ public class GoalControllerTest {
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("name", "Goal name must be 1-25 characters");
+        assertThat(actual.getErrors().get("name")).contains("Goal name must be 1-25 characters");
     }
 
     @Test
@@ -86,18 +86,18 @@ public class GoalControllerTest {
                 .build();
 
         ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
-        .body(invalidRequest)
-        .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody(ValidationProblemDetail.class)
-        .returnResult()
-        .getResponseBody();
+                .body(invalidRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ValidationProblemDetail.class)
+                .returnResult()
+                .getResponseBody();
 
         assertThat(actual.getDetail()).isEqualTo("Validation failed");
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("name", "Goal name must be 1-25 characters");
+        assertThat(actual.getErrors().get("name")).contains("Goal name must be 1-25 characters");
     }
 
     @Test
@@ -105,18 +105,18 @@ public class GoalControllerTest {
         GoalRequest invalidRequest = GoalRequest.builder().build();
 
         ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
-        .body(invalidRequest)
-        .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody(ValidationProblemDetail.class)
-        .returnResult()
-        .getResponseBody();
+                .body(invalidRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ValidationProblemDetail.class)
+                .returnResult()
+                .getResponseBody();
 
         assertThat(actual.getDetail()).isEqualTo("Validation failed");
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("name", "Goal must have a name");
+        assertThat(actual.getErrors().get("name")).contains("Goal must have a name");
     }
 
     @Test
@@ -124,18 +124,18 @@ public class GoalControllerTest {
         GoalRequest invalidRequest = GoalRequest.builder().build();
 
         ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
-        .body(invalidRequest)
-        .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody(ValidationProblemDetail.class)
-        .returnResult()
-        .getResponseBody();
+                .body(invalidRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ValidationProblemDetail.class)
+                .returnResult()
+                .getResponseBody();
 
         assertThat(actual.getDetail()).isEqualTo("Validation failed");
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("target", "Goal must have a numerical target");
+        assertThat(actual.getErrors().get("target")).contains("Goal must have a numerical target");
     }
 
     @Test
@@ -145,19 +145,19 @@ public class GoalControllerTest {
                 .build();
 
         ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
-        .body(invalidRequest)
-        .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody(ValidationProblemDetail.class)
-        .returnResult()
-        .getResponseBody();
+                .body(invalidRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ValidationProblemDetail.class)
+                .returnResult()
+                .getResponseBody();
 
         assertThat(actual.getDetail()).isEqualTo("Validation failed");
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("target",
-                "Target must be up to 1 billion with 3 decimal places at most");
+        assertThat(actual.getErrors().get("target"))
+                .contains("Target must be up to 1 billion with 3 decimal places at most");
     }
 
 
@@ -168,19 +168,19 @@ public class GoalControllerTest {
                 .build();
 
         ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
-        .body(invalidRequest)
-        .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody(ValidationProblemDetail.class)
-        .returnResult()
-        .getResponseBody();
+                .body(invalidRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ValidationProblemDetail.class)
+                .returnResult()
+                .getResponseBody();
 
         assertThat(actual.getDetail()).isEqualTo("Validation failed");
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("target",
-                "Target must be up to 1 billion with 3 decimal places at most");
+        assertThat(actual.getErrors().get("target"))
+                .contains("Target must be up to 1 billion with 3 decimal places at most");
     }
 
 
