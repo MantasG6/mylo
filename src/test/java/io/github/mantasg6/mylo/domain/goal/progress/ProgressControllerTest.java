@@ -231,4 +231,27 @@ public class ProgressControllerTest {
         assertThat(actual.getErrors().get("effectiveDate"))
                 .contains("Effective Date cannot be in the future");
     }
+
+    @Test
+    void PUT_shouldReturnBadRequest_whenEffectiveDateFormatInvalid() {
+        ProgressRequest request = ProgressRequest.builder()
+                .amount(new BigDecimal("34")).build();
+
+        ValidationProblemDetail actual = restTestClient.put()
+                .uri("/api/goals/1/progress/202020-01-23")
+                .body(request)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ValidationProblemDetail.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(actual.getDetail()).isEqualTo("Validation failed");
+        assertThat(actual.getInstance()).isEqualTo(
+                URI.create("/api/goals/1/progress/202020-01-23"));
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        assertThat(actual.getErrors().get("effectiveDate"))
+                .contains("Invalid value '202020-01-23'. Expected type: LocalDate");
+    }
 }

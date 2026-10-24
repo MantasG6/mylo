@@ -24,6 +24,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
 import tools.jackson.databind.exc.InvalidFormatException;
@@ -41,6 +43,29 @@ public class GlobalExceptionHandler {
     private static final String INVALID_VALUE = "Invalid value";
     private static final String VALIDATION_FAILED = "Validation failed";
     private static final String INVALID_JSON = "Invalid JSON request";
+
+    /**
+     * Handle invalid path variable values.
+     *
+     * @param ex Exception thrown when path variable value is invalid.
+     * @return Problem Detail with validation error map.
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ValidationProblemDetail handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        ValidationProblemDetail problemDetail = new ValidationProblemDetail(HttpStatus.BAD_REQUEST.value());
+        problemDetail.setTitle(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        problemDetail.setDetail(VALIDATION_FAILED);
+
+        Class<?> required = ex.getRequiredType();
+        String expected = required != null ? required.getSimpleName() : "unknown";
+
+        String message = String.format("Invalid value '%s'. Expected type: %s",
+                ex.getValue(), expected);
+
+        problemDetail.setErrors(Map.of(ex.getName(), List.of(message)));
+
+        return problemDetail;
+    }
 
     /**
      * Handle validation errors.
@@ -83,6 +108,18 @@ public class GlobalExceptionHandler {
         problem.setInstance(URI.create(request.getRequestURI()));
 
         return problem;
+    }
+
+    /**
+     * Handle not available resources / endpoints.
+     *
+     * @param ex Exception to be handled.
+     * @return Standard problem details response with a 404 result code.
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ProblemDetail handleResourceNotFound(NoResourceFoundException ex) {
+        return ProblemDetail.forStatusAndDetail(
+            HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     /**
