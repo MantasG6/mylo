@@ -48,4 +48,8 @@ public class Progress {
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    public Progress(ProgressId id) {
+        this.id = id;
+    }
 }

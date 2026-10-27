@@ -33,6 +33,7 @@ public class WorkspaceService {
      *
      * @param id ID of the workspace.
      * @return Workspace details of the workspace with the provided id.
+     * @throws WorkspaceNotFoundException if Workspace with provided id not found.
      */
     public WorkspaceResponse getWorkspaceById(Long id) {
         Workspace workspace = workspaceRepository.findById(id)
@@ -57,6 +58,7 @@ public class WorkspaceService {
      * @param id ID of the workspace to update.
      * @param request Workspace details to be updated.
      * @return New workspace details.
+     * @throws WorkspaceNotFoundException if Workspace with provided id not found.
      */
     public WorkspaceResponse updateWorkspace(Long id, WorkspaceRequest request) {
         Workspace workspace = workspaceRepository.findById(id).orElseThrow(() -> new WorkspaceNotFoundException(id));

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import io.github.mantasg6.mylo.domain.goal.progress.ProgressRepository;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -17,6 +18,7 @@ public class GoalService {
 
     private final GoalRepository repository;
     private final GoalMapper mapper;
+    private final ProgressRepository progressRepository;
 
     /**
      * Get all Goals from the database.
@@ -32,8 +34,9 @@ public class GoalService {
     /**
      * Get Goal by ID.
      *
-     * @param id 
-     * @return 
+     * @param id Id of the Goal to retrieve.
+     * @return Details of the retrieved Goal.
+     * @throws GoalNotFoundException if Goal with provided id not found.
      */
     public GoalResponse getGoalById(Long id) {
         Goal goal = repository.findById(id).orElseThrow(() -> new GoalNotFoundException(id));
@@ -56,6 +59,7 @@ public class GoalService {
      * @param id ID of the Goal to be updated.
      * @param request New details of the Goal to be updated.
      * @return New Goal details.
+     * @throws GoalNotFoundException if Goal with provided id not found.
      */
     public GoalResponse updateGoal(Long id, GoalRequest request) {
         Goal goal = repository.findById(id).orElseThrow(() -> new GoalNotFoundException(id));
@@ -71,6 +75,7 @@ public class GoalService {
      * @param id ID of the Goal to be deleted.
      */
     public void deleteGoal(Long id) {
+        progressRepository.deleteAllByGoalId(id);
         repository.deleteById(id);
     }
 }
