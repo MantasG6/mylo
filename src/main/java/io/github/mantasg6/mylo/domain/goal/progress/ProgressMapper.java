@@ -24,7 +24,6 @@ public interface ProgressMapper {
      * @param request Progress Request to convert.
      */
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "goal", ignore = true)
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)

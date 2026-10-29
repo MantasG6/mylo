@@ -68,9 +68,9 @@ public class ProgressService {
 
         // Finally update the progress
         progress.setAmount(request.amount());
-        progressRepository.save(progress);
+        Progress updated = progressRepository.save(progress);
 
-        return progressMapper.toDto(progress);
+        return progressMapper.toDto(updated);
     }
 
     /**

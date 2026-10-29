@@ -1,11 +1,9 @@
 package io.github.mantasg6.mylo.domain.goal;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
@@ -25,12 +23,6 @@ public record GoalRequest(
         groups = OnCreate.class
     )
     String name,
-
-    @PastOrPresent(
-        message = "Goal effective date cannot be in the future",
-        groups = { OnCreate.class, OnUpdate.class }
-    )
-    LocalDate effectiveDate,
 
     @NotNull(
         message = "Goal must have a numerical target",
