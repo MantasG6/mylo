@@ -1,17 +1,11 @@
 package io.github.mantasg6.mylo.domain.goal.progress;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.util.UUID;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
+import io.github.mantasg6.mylo.core.database.BaseEntityNoId;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,26 +17,16 @@ import lombok.Setter;
 @Setter
 @Getter
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = "progress")
-public class Progress {
+public class Progress extends BaseEntityNoId {
 
     @EmbeddedId
     private ProgressId id;
 
-    @Column(nullable = false)
+    // TODO: Add goal FK
+
+    @Column(precision = 9, scale = 3, nullable = false)
     private BigDecimal amount;
-
-    @Column(name = "user_id")
-    private UUID userId;
-
-    @CreatedDate
-    @Column(name = "created_at", updatable = false, nullable = false)
-    private Instant createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at", nullable = false)
-    private Instant updatedAt;
 
     public Progress() {}
 
