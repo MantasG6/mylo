@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -209,7 +208,6 @@ public class GoalWidgetHandlerTest {
                         GoalResponse.builder()
                                 .id(11L)
                                 .name("Goal #1")
-                                .progress(new ArrayList<>())
                                 .build()
                 ).build();
         WidgetResponse<GoalResponse> expectedPlain = WidgetResponse.<GoalResponse>builder()

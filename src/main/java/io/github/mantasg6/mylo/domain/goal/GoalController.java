@@ -4,17 +4,19 @@ import java.net.URI;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import jakarta.validation.Valid;
+import io.github.mantasg6.mylo.domain.goal.GoalRequest.OnCreate;
+import io.github.mantasg6.mylo.domain.goal.GoalRequest.OnUpdate;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -58,7 +60,11 @@ public class GoalController {
      * @return HTTP 201 and details of the new Goal.
      */
     @PostMapping
-    public ResponseEntity<GoalResponse> createGoal(@RequestBody @Valid GoalRequest request) {
+    public ResponseEntity<GoalResponse> createGoal(
+            @RequestBody
+            @Validated(OnCreate.class)
+            GoalRequest request
+    ) {
         GoalResponse created = goalService.createGoal(request);
 
         URI location = ServletUriComponentsBuilder
@@ -77,10 +83,10 @@ public class GoalController {
      * @param request Details to update.
      * @return HTTP 200 and updated Goal.
      */
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<GoalResponse> updateGoal(
         @PathVariable Long id,
-        @RequestBody @Valid GoalRequest request
+        @RequestBody @Validated(OnUpdate.class) GoalRequest request
     ) {
         return ResponseEntity.ok(goalService.updateGoal(id, request));
     }

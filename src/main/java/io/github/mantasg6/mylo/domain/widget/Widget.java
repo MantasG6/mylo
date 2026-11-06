@@ -34,6 +34,7 @@ public class Widget extends BaseEntity {
     @Column(nullable = false)
     private Integer position;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private WidgetType type;
 }

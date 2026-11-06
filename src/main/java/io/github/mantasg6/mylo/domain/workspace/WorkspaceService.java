@@ -1,7 +1,6 @@
 package io.github.mantasg6.mylo.domain.workspace;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -34,6 +33,7 @@ public class WorkspaceService {
      *
      * @param id ID of the workspace.
      * @return Workspace details of the workspace with the provided id.
+     * @throws WorkspaceNotFoundException if Workspace with provided id not found.
      */
     public WorkspaceResponse getWorkspaceById(Long id) {
         Workspace workspace = workspaceRepository.findById(id)
@@ -58,22 +58,12 @@ public class WorkspaceService {
      * @param id ID of the workspace to update.
      * @param request Workspace details to be updated.
      * @return New workspace details.
+     * @throws WorkspaceNotFoundException if Workspace with provided id not found.
      */
     public WorkspaceResponse updateWorkspace(Long id, WorkspaceRequest request) {
         Workspace workspace = workspaceRepository.findById(id).orElseThrow(() -> new WorkspaceNotFoundException(id));
-
-        Optional.ofNullable(request.name()).ifPresent(workspace::setName);
-        Optional.ofNullable(request.periodStart()).ifPresent(workspace::setPeriodStart);
-        Optional.ofNullable(request.periodEnd()).ifPresent(workspace::setPeriodEnd);
-
-        if (workspace.getPeriodStart().isAfter(workspace.getPeriodEnd())) {
-            throw new WorkspacePeriodException(
-                WorkspaceErrorMessage.PERIOD_START_AFTER_END(
-                    workspace.getPeriodStart(),
-                    workspace.getPeriodEnd()
-                )
-            );
-        }
+        
+        workspace.setName(request.name());
 
         return workspaceMapper.toDto(workspaceRepository.save(workspace));
     }

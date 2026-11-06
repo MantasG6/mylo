@@ -1,13 +1,10 @@
 package io.github.mantasg6.mylo.domain.goal;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
 
 import io.github.mantasg6.mylo.core.database.BaseEntity;
-import io.github.mantasg6.mylo.domain.progress.Progress;
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,12 +19,9 @@ import lombok.Setter;
 @Table(name = "goals")
 public class Goal extends BaseEntity {
 
+    @Column(nullable = false)
     private String name;
 
-    @OneToMany(
-        mappedBy = "goal",
-        cascade = CascadeType.ALL,
-        orphanRemoval = true
-    )
-    private List<Progress> progress = new ArrayList<>();
+    @Column(nullable = false)
+    private BigDecimal target;
 }

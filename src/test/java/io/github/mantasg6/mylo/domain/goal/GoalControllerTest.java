@@ -3,6 +3,7 @@ package io.github.mantasg6.mylo.domain.goal;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.net.URI;
 
 import org.junit.jupiter.api.Test;
@@ -30,12 +31,15 @@ public class GoalControllerTest {
     void POST_shouldReturnCreated_whenValidRequest() {
         Long id = 1L;
         String name = "Goal #1";
+        BigDecimal target = new BigDecimal("10.365");
         GoalRequest request = GoalRequest.builder()
                 .name(name)
+                .target(target)
                 .build();
         GoalResponse expected = GoalResponse.builder()
                 .id(id)
                 .name(name)
+                .target(target)
                 .build();
         when(goalService.createGoal(request)).thenReturn(expected);
 
@@ -51,6 +55,7 @@ public class GoalControllerTest {
         assertThat(location.getPath()).isEqualTo("/api/goals/1");
         assertThat(actual.id()).isEqualTo(id);
         assertThat(actual.name()).isEqualTo(name);
+        assertThat(actual.target()).isEqualTo(target);
     }
 
     @Test
@@ -71,6 +76,142 @@ public class GoalControllerTest {
         assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
         assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
         assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        assertThat(actual.getErrors()).containsEntry("name", "Goal name must be 1-25 characters");
+        assertThat(actual.getErrors().get("name")).contains("Goal name must be 1-25 characters");
+    }
+
+    @Test
+    void POST_shouldReturnBadRequest_whenNameEmpty() {
+        GoalRequest invalidRequest = GoalRequest.builder()
+                .name("")
+                .build();
+
+        ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
+                .body(invalidRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ValidationProblemDetail.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(actual.getDetail()).isEqualTo("Validation failed");
+        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        assertThat(actual.getErrors().get("name")).contains("Goal name must be 1-25 characters");
+    }
+
+    @Test
+    void POST_shouldReturnBadRequest_whenNameNull() {
+        GoalRequest invalidRequest = GoalRequest.builder().build();
+
+        ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
+                .body(invalidRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ValidationProblemDetail.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(actual.getDetail()).isEqualTo("Validation failed");
+        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        assertThat(actual.getErrors().get("name")).contains("Goal must have a name");
+    }
+
+    @Test
+    void POST_shouldReturnBadRequest_whenTargetNull() {
+        GoalRequest invalidRequest = GoalRequest.builder().build();
+
+        ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
+                .body(invalidRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ValidationProblemDetail.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(actual.getDetail()).isEqualTo("Validation failed");
+        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        assertThat(actual.getErrors().get("target")).contains("Goal must have a numerical target");
+    }
+
+    @Test
+    void POST_shouldReturnBadRequest_whenTargetTooBig() {
+        GoalRequest invalidRequest = GoalRequest.builder()
+                .target(new BigDecimal("1000000000"))
+                .build();
+
+        ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
+                .body(invalidRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ValidationProblemDetail.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(actual.getDetail()).isEqualTo("Validation failed");
+        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        assertThat(actual.getErrors().get("target"))
+                .contains("Target must be up to 1 billion with 3 decimal places at most");
+    }
+
+
+    @Test
+    void POST_shouldReturnBadRequest_whenTargetMoreThan3DecimalPlaces() {
+        GoalRequest invalidRequest = GoalRequest.builder()
+                .target(new BigDecimal("1.3183"))
+                .build();
+
+        ValidationProblemDetail actual = restTestClient.post().uri("/api/goals")
+                .body(invalidRequest)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(ValidationProblemDetail.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(actual.getDetail()).isEqualTo("Validation failed");
+        assertThat(actual.getInstance()).isEqualTo(URI.create("/api/goals"));
+        assertThat(actual.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(actual.getTitle()).isEqualTo(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        assertThat(actual.getErrors().get("target"))
+                .contains("Target must be up to 1 billion with 3 decimal places at most");
+    }
+
+
+    @Test
+    void POST_shouldReturnCreated_whenTargetAlmostTooBig() {
+        Long id = 1L;
+        String name = "Goal #1";
+        BigDecimal target = new BigDecimal("999999999.99");
+        GoalRequest request = GoalRequest.builder()
+                .name(name)
+                .target(target)
+                .build();
+        GoalResponse expected = GoalResponse.builder()
+                .id(id)
+                .name(name)
+                .target(target)
+                .build();
+        when(goalService.createGoal(request)).thenReturn(expected);
+
+        EntityExchangeResult<GoalResponse> result = restTestClient.post().uri("/api/goals")
+                .body(request)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(GoalResponse.class)
+                .returnResult();
+        URI location = result.getResponseHeaders().getLocation();
+        GoalResponse actual = result.getResponseBody();
+
+        assertThat(location.getPath()).isEqualTo("/api/goals/1");
+        assertThat(actual.id()).isEqualTo(id);
+        assertThat(actual.name()).isEqualTo(name);
+        assertThat(actual.target()).isEqualTo(target);
     }
 }

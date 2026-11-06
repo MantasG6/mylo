@@ -1,6 +1,5 @@
 package io.github.mantasg6.mylo.domain.workspace;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +23,7 @@ import lombok.Setter;
 @Table(name = "workspaces")
 public class Workspace extends BaseEntity {
 
+    @Column(nullable = false)
     private String name;
 
     @OneToMany(
@@ -32,12 +32,6 @@ public class Workspace extends BaseEntity {
         orphanRemoval = true
     )
     private List<Widget> widgets = new ArrayList<>();
-
-    @Column(name = "period_start")
-    private LocalDate periodStart;
-
-    @Column(name = "period_end")
-    private LocalDate periodEnd;
 
     /**
      * Helper method to add a Widget to the Workspace.

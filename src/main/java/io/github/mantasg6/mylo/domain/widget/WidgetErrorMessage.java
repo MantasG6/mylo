@@ -16,6 +16,13 @@ public class WidgetErrorMessage {
         return String.format("Widget with id %d not found!", id);
     }
 
+    /**
+     * Position already taken message.
+     *
+     * @param workspaceId Workspace that contains the taken position.
+     * @param position The position that is already taken.
+     * @return Formatted message for the user.
+     */
     public static final String POSITION_TAKEN(Long workspaceId, Integer position) {
         return String.format("Position %d is already taken in Workspace with id %d.", position, workspaceId);
     }

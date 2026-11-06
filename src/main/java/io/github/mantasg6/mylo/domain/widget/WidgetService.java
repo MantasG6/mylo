@@ -54,6 +54,7 @@ public class WidgetService {
      *
      * @param id ID of the Widget to retrieve.
      * @return Retrieved Widget details.
+     * @throws WidgetNotFoundException if Widget with provided id not found.
      */
     public WidgetResponse<?> getWidgetById(Long id) {
         Widget widget = widgetRepository.findById(id)
@@ -67,6 +68,8 @@ public class WidgetService {
      *
      * @param request Request with details of the new Widget.
      * @return Response with details about the new Widget.
+     * @throws WorkspaceNotFoundException if Workspace with provided workspaceId not found.
+     * @throws WidgetPositionException if position in the request is already taken.
      */
     @Transactional
     public WidgetResponse<?> createWidget(WidgetRequest request) {
@@ -93,6 +96,9 @@ public class WidgetService {
      * @param id ID of the Widget to update.
      * @param request Request with Widget details to update.
      * @return Details of the updated Widget.
+     * @throws WidgetNotFoundException if Widget with provided id not found.
+     * @throws WorkspaceNotFoundException if Workspace with workspaceId in the request not found.
+     * @throws WidgetPositionException if position in the request is already taken.
      */
     public WidgetResponse<?> updateWidget(Long id, WidgetRequest request) {
         // Retrieve required entities.
