@@ -29,7 +29,7 @@ public class ProgressRepositoryTest {
         progress.setCreatedAt(Instant.now());
         progress.setUpdatedAt(Instant.now());
 
-        progressRepository.save(progress).getId();
+        progressRepository.save(progress);
         testEntityManager.flush();
         testEntityManager.clear();
         Progress saved = progressRepository.findById(id).orElseThrow();
