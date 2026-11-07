@@ -22,6 +22,6 @@ public class Goal extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(precision = 9, scale = 3, nullable = false)
     private BigDecimal target;
 }

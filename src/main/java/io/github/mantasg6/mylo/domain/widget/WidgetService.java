@@ -100,6 +100,7 @@ public class WidgetService {
      * @throws WorkspaceNotFoundException if Workspace with workspaceId in the request not found.
      * @throws WidgetPositionException if position in the request is already taken.
      */
+    @Transactional
     public WidgetResponse<?> updateWidget(Long id, WidgetRequest request) {
         // Retrieve required entities.
         Widget widget = widgetRepository.findById(id)
