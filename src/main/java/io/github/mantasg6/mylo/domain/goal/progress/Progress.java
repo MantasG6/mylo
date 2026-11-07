@@ -2,10 +2,17 @@ package io.github.mantasg6.mylo.domain.goal.progress;
 
 import java.math.BigDecimal;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import io.github.mantasg6.mylo.core.database.BaseEntityNoId;
+import io.github.mantasg6.mylo.domain.goal.Goal;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +30,10 @@ public class Progress extends BaseEntityNoId {
     @EmbeddedId
     private ProgressId id;
 
-    // TODO: Add goal FK
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "goal_id", insertable = false, updatable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Goal goal;
 
     @Column(precision = 9, scale = 3, nullable = false)
     private BigDecimal amount;
